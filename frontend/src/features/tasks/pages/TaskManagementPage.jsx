@@ -5,6 +5,7 @@ import {
   buildEisenhowerMatrix,
   EISENHOWER_QUADRANTS,
   getOverdueTasks,
+  isTaskUrgent,
   prioritizeTasks
 } from "../services/taskPrioritization";
 import { Button } from "../../../shared/components/ui/Button";
@@ -16,8 +17,7 @@ const DEFAULT_TASK_FORM = {
   title: "",
   description: "",
   deadline: "",
-  urgency: "3",
-  importance: "3",
+  importance: "no",
   status: "pending"
 };
 
@@ -111,8 +111,7 @@ export function TaskManagementPage() {
       title: task.title,
       description: task.description ?? "",
       deadline: toLocalDateTimeValue(task.deadline),
-      urgency: String(task.urgency),
-      importance: String(task.importance),
+      importance: task.importance ? "yes" : "no",
       status: task.status
     });
     setSubmitErrorMessage("");
@@ -131,12 +130,17 @@ export function TaskManagementPage() {
     setIsSubmitting(true);
     setSubmitErrorMessage("");
 
+    const deadline = toDatabaseDateTime(taskForm.deadline);
+
+    // Auto-compute urgency from the deadline
+    const urgency = deadline ? isTaskUrgent({ deadline }, new Date()) : false;
+
     const payload = {
       title: taskForm.title.trim(),
       description: taskForm.description.trim() || null,
-      deadline: toDatabaseDateTime(taskForm.deadline),
-      urgency: Number(taskForm.urgency),
-      importance: Number(taskForm.importance),
+      deadline,
+      urgency,
+      importance: taskForm.importance === "yes",
       status: taskForm.status
     };
 
@@ -284,34 +288,17 @@ export function TaskManagementPage() {
             </div>
           </div>
 
-          <div className="form-grid-2">
-            <div>
-              <label htmlFor="task-urgency">Urgency (1-5)</label>
-              <input
-                id="task-urgency"
-                name="urgency"
-                type="number"
-                min="1"
-                max="5"
-                value={taskForm.urgency}
-                onChange={handleTaskFormChange}
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="task-importance">Importance (1-5)</label>
-              <input
-                id="task-importance"
-                name="importance"
-                type="number"
-                min="1"
-                max="5"
-                value={taskForm.importance}
-                onChange={handleTaskFormChange}
-                required
-              />
-            </div>
+          <div>
+            <label htmlFor="task-importance">Is this task important?</label>
+            <select
+              id="task-importance"
+              name="importance"
+              value={taskForm.importance}
+              onChange={handleTaskFormChange}
+            >
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
           </div>
 
           <div className="actions-row">
@@ -402,7 +389,7 @@ export function TaskManagementPage() {
                     <li key={task.id} className="data-list-item">
                       <h4>{task.title}</h4>
                       <p className="data-list-meta">
-                        Urgency {task.urgency} | Importance {task.importance}
+                        {task.isUrgent ? "⚡ Urgent" : "Not Urgent"} | {task.isImportant ? "⭐ Important" : "Not Important"}
                       </p>
                     </li>
                   ))}

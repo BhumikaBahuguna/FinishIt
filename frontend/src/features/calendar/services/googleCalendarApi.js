@@ -120,14 +120,19 @@ async function calendarRequest(endpoint, options = {}, interactive = false) {
 }
 
 function buildReminderOverrides(task) {
-  const urgency = Number(task.urgency ?? 3);
+  // Import would create a circular dep, so inline the 48-hour check
+  const FORTY_EIGHT_HOURS_MS = 48 * 60 * 60 * 1000;
+  let isUrgent = false;
 
-  if (urgency >= 5) {
-    return [{ method: "popup", minutes: 1440 }, { method: "popup", minutes: 60 }, { method: "popup", minutes: 10 }];
+  if (task.deadline) {
+    const deadlineTimestamp = new Date(task.deadline).getTime();
+    if (!Number.isNaN(deadlineTimestamp)) {
+      isUrgent = deadlineTimestamp <= Date.now() + FORTY_EIGHT_HOURS_MS;
+    }
   }
 
-  if (urgency >= 4) {
-    return [{ method: "popup", minutes: 1440 }, { method: "popup", minutes: 60 }];
+  if (isUrgent) {
+    return [{ method: "popup", minutes: 1440 }, { method: "popup", minutes: 60 }, { method: "popup", minutes: 10 }];
   }
 
   return [{ method: "popup", minutes: 1440 }];

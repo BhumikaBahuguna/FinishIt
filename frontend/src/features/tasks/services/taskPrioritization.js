@@ -1,5 +1,7 @@
 const TERMINAL_TASK_STATUSES = new Set(["completed", "archived"]);
 
+const FORTY_EIGHT_HOURS_MS = 48 * 60 * 60 * 1000;
+
 export const EISENHOWER_QUADRANTS = {
   DO_FIRST: "urgent_important",
   SCHEDULE: "important_not_urgent",
@@ -30,12 +32,24 @@ function toDeadlineTimestamp(deadline) {
   return Number.isNaN(timestamp) ? Number.POSITIVE_INFINITY : timestamp;
 }
 
-export function getEisenhowerQuadrant(task, options = {}) {
-  const urgentThreshold = options.urgentThreshold ?? 4;
-  const importantThreshold = options.importantThreshold ?? 4;
+/**
+ * A task is urgent if its deadline is within the next 48 hours or already past.
+ * Tasks without a deadline are not urgent.
+ */
+export function isTaskUrgent(task, now = new Date()) {
+  if (!task.deadline) return false;
 
-  const isUrgent = Number(task.urgency) >= urgentThreshold;
-  const isImportant = Number(task.importance) >= importantThreshold;
+  const deadlineTimestamp = new Date(task.deadline).getTime();
+  if (Number.isNaN(deadlineTimestamp)) return false;
+
+  return deadlineTimestamp <= now.getTime() + FORTY_EIGHT_HOURS_MS;
+}
+
+export function getEisenhowerQuadrant(task, options = {}) {
+  const now = options.now ?? new Date();
+
+  const isUrgent = isTaskUrgent(task, now);
+  const isImportant = Boolean(task.importance);
 
   if (isUrgent && isImportant) return EISENHOWER_QUADRANTS.DO_FIRST;
   if (!isUrgent && isImportant) return EISENHOWER_QUADRANTS.SCHEDULE;
@@ -48,13 +62,17 @@ export function getQuadrantLabel(quadrant) {
 }
 
 export function prioritizeTasks(tasks, options = {}) {
+  const now = options.now ?? new Date();
+
   return [...tasks]
     .map((task) => {
-      const quadrant = getEisenhowerQuadrant(task, options);
+      const quadrant = getEisenhowerQuadrant(task, { now });
       return {
         ...task,
         quadrant,
-        quadrantLabel: getQuadrantLabel(quadrant)
+        quadrantLabel: getQuadrantLabel(quadrant),
+        isUrgent: isTaskUrgent(task, now),
+        isImportant: Boolean(task.importance)
       };
     })
     .sort((left, right) => {
@@ -72,12 +90,9 @@ export function prioritizeTasks(tasks, options = {}) {
         return deadlineDifference;
       }
 
-      if (left.importance !== right.importance) {
-        return Number(right.importance) - Number(left.importance);
-      }
-
-      if (left.urgency !== right.urgency) {
-        return Number(right.urgency) - Number(left.urgency);
+      // Important tasks come first within the same quadrant / deadline
+      if (left.isImportant !== right.isImportant) {
+        return left.isImportant ? -1 : 1;
       }
 
       return new Date(right.created_at).getTime() - new Date(left.created_at).getTime();

@@ -1,11 +1,9 @@
 import { createOrUpdateTaskCalendarEvent } from "./googleCalendarApi";
 import { upsertTaskCalendarSyncEntry } from "./calendarSyncApi";
+import { isTaskUrgent } from "../../tasks/services/taskPrioritization";
 
-function getReminderMinutesByUrgency(urgency) {
-  const value = Number(urgency ?? 3);
-
-  if (value >= 5) return [1440, 60, 10];
-  if (value >= 4) return [1440, 60];
+function getReminderMinutes(urgent) {
+  if (urgent) return [1440, 60, 10];
   return [1440];
 }
 
@@ -20,7 +18,8 @@ export async function syncTaskDeadlineToCalendar({ userId, task, existingSyncEnt
 
   try {
     const event = await createOrUpdateTaskCalendarEvent(task, existingSyncEntry?.external_event_id);
-    const reminderMinutes = getReminderMinutesByUrgency(task.urgency);
+    const urgent = isTaskUrgent(task);
+    const reminderMinutes = getReminderMinutes(urgent);
 
     const syncResult = await upsertTaskCalendarSyncEntry({
       userId,
@@ -41,13 +40,15 @@ export async function syncTaskDeadlineToCalendar({ userId, task, existingSyncEnt
       skipped: false
     };
   } catch (error) {
+    const urgent = isTaskUrgent(task);
+
     await upsertTaskCalendarSyncEntry({
       userId,
       taskId: task.id,
       externalEventId: existingSyncEntry?.external_event_id ?? null,
       syncStatus: "failed",
       errorMessage: error.message,
-      reminderMinutes: getReminderMinutesByUrgency(task.urgency)
+      reminderMinutes: getReminderMinutes(urgent)
     });
 
     return {

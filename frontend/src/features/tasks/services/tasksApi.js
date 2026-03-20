@@ -21,11 +21,11 @@ function normalizeTaskPayload(taskInput) {
   const payload = { ...normalized };
 
   if (Object.hasOwn(payload, "urgency")) {
-    payload.urgency = Number(payload.urgency);
+    payload.urgency = Boolean(payload.urgency);
   }
 
   if (Object.hasOwn(payload, "importance")) {
-    payload.importance = Number(payload.importance);
+    payload.importance = Boolean(payload.importance);
   }
 
   if (Object.hasOwn(payload, "deadline") && !payload.deadline) {

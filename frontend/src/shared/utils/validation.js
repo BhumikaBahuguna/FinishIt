@@ -66,23 +66,17 @@ export function validateTaskPayload(taskInput, options = {}) {
     normalized.description = String(normalized.description).trim();
   }
 
-  if (!partial || Object.hasOwn(normalized, "urgency")) {
-    const urgency = parseBoundedInteger(normalized.urgency, 1, 5);
-
-    if (!urgency.valid) {
-      errors.push("Task urgency must be an integer between 1 and 5.");
-    } else {
-      normalized.urgency = urgency.value;
-    }
+  // Urgency is auto-computed from the deadline — skip user-input validation.
+  // If present, normalize to boolean.
+  if (Object.hasOwn(normalized, "urgency")) {
+    normalized.urgency = Boolean(normalized.urgency);
   }
 
   if (!partial || Object.hasOwn(normalized, "importance")) {
-    const importance = parseBoundedInteger(normalized.importance, 1, 5);
-
-    if (!importance.valid) {
-      errors.push("Task importance must be an integer between 1 and 5.");
-    } else {
-      normalized.importance = importance.value;
+    if (normalized.importance == null && !partial) {
+      errors.push("Task importance is required (true or false).");
+    } else if (Object.hasOwn(normalized, "importance")) {
+      normalized.importance = Boolean(normalized.importance);
     }
   }
 
