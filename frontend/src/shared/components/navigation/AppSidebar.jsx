@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../../features/auth/hooks/useAuth";
+import { useNotifications } from "../../../features/notifications/hooks/useNotifications";
 import { Button } from "../ui/Button";
 
 const navigationItems = [
@@ -13,6 +14,11 @@ const navigationItems = [
 
 export function AppSidebar() {
   const { user, signOut } = useAuth();
+  const { notifications } = useNotifications();
+
+  const hasImportantUnread = notifications.some(
+    (n) => !n.isRead && (n.severity === "critical" || n.severity === "warning")
+  );
 
   async function handleSignOut() {
     await signOut();
@@ -36,6 +42,9 @@ export function AppSidebar() {
                 }
               >
                 {item.label}
+                {item.to === "/notifications" && hasImportantUnread && (
+                  <span className="blinking-dot" aria-hidden="true" />
+                )}
               </NavLink>
             </li>
           ))}

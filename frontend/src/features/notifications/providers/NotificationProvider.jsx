@@ -64,7 +64,12 @@ export function NotificationProvider({ children }) {
         if (seen.has(notification.id)) return;
 
         seen.add(notification.id);
-        emitBrowserNotification(notification);
+        
+        // Disable browser popups for critical and warning notifications
+        // Instead, rely on the blinking dot UI indicator.
+        if (notification.severity !== "critical" && notification.severity !== "warning") {
+          emitBrowserNotification(notification);
+        }
 
         if (notification.type === "daily_reminder") {
           setDailyReminderSent();

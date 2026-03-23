@@ -369,7 +369,7 @@ export function TaskManagementPage() {
       <Card title="Eisenhower Matrix">
         <section className="matrix-grid">
           {QUADRANT_RENDER_ORDER.map((quadrant) => (
-            <article key={quadrant} className="matrix-quadrant">
+            <article key={quadrant} className={`matrix-quadrant matrix-quadrant-${quadrant}`}>
               <h3>
                 {matrix[quadrant][0]?.quadrantLabel ||
                   (quadrant === EISENHOWER_QUADRANTS.DO_FIRST

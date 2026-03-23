@@ -28,7 +28,7 @@ export function PrioritizedTaskSections({ matrix }) {
           const tasks = matrix[quadrant.key] ?? [];
 
           return (
-            <article key={quadrant.key} className="matrix-quadrant">
+            <article key={quadrant.key} className={`matrix-quadrant matrix-quadrant-${quadrant.key}`}>
               <h3>{quadrant.title}</h3>
               {tasks.length === 0 ? <p className="data-list-meta">No tasks.</p> : null}
 

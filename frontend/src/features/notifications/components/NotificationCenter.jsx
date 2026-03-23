@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useNotifications } from "../hooks/useNotifications";
 
@@ -13,82 +14,101 @@ export function NotificationCenter() {
     unreadCount,
     markAsRead,
     markAllAsRead,
-    refreshNotifications,
     requestBrowserPermission,
     browserPermission,
     isLoading
   } = useNotifications();
 
-  const previewNotifications = notifications.slice(0, 6);
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  // Close when clicking outside the dropdown container
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Show only unread notifications initially up to a limit
+  const unreadNotifications = notifications.filter((n) => !n.isRead).slice(0, 15);
 
   return (
-    <section className="notification-center" aria-label="Notifications">
-      <div className="notification-toolbar">
-        <h2 className="notification-title">Notifications</h2>
-        <span className="notification-count">{unreadCount} unread</span>
-      </div>
+    <div className="notification-dropdown-container" ref={containerRef}>
+      <button 
+        type="button" 
+        className="notification-bell" 
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label="Toggle notifications"
+      >
+        <span className="bell-icon">🔔</span>
+        {unreadCount > 0 && <span className="bell-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>}
+      </button>
 
-      <div className="notification-actions">
-        <button type="button" className="btn btn-secondary" onClick={refreshNotifications}>
-          Refresh
-        </button>
-        <button type="button" className="btn btn-secondary" onClick={markAllAsRead}>
-          Mark All Read
-        </button>
-        {browserPermission !== "granted" ? (
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={requestBrowserPermission}
-          >
-            Enable Browser Alerts
-          </button>
-        ) : null}
-        <Link className="btn btn-primary" to="/notifications">
-          View All
-        </Link>
-      </div>
+      {isOpen && (
+        <div className="notification-dropdown">
+          <div className="notification-dropdown-header">
+            <h3 className="notification-title">Unread</h3>
+            <button type="button" className="notification-link" onClick={markAllAsRead}>
+              Mark All Read
+            </button>
+          </div>
 
-      {isLoading ? <p className="data-list-meta">Loading notifications...</p> : null}
-
-      {!isLoading && previewNotifications.length === 0 ? (
-        <p className="data-list-meta">No active notifications.</p>
-      ) : null}
-
-      {!isLoading && previewNotifications.length > 0 ? (
-        <ul className="notification-list">
-          {previewNotifications.map((notification) => (
-            <li
-              key={notification.id}
-              className={
-                notification.isRead
-                  ? `${getSeverityClassName(notification.severity)} is-read`
-                  : getSeverityClassName(notification.severity)
-              }
-            >
-              <div className="notification-item-body">
-                <h3>{notification.title}</h3>
-                <p className="data-list-meta">{notification.message}</p>
-              </div>
-
-              <div className="notification-item-actions">
-                <Link to={notification.route ?? "/dashboard"} className="notification-link">
-                  Open
-                </Link>
-                {!notification.isRead ? (
-                  <button
-                    type="button"
-                    className="notification-link"
-                    onClick={() => markAsRead(notification.id)}
+          <div className="notification-dropdown-body">
+            {isLoading ? (
+              <p className="data-list-meta" style={{ padding: "1rem", textAlign: "center" }}>Loading...</p>
+            ) : unreadNotifications.length === 0 ? (
+              <p className="data-list-meta" style={{ padding: "1rem", textAlign: "center" }}>All caught up!</p>
+            ) : (
+              <ul className="notification-list">
+                {unreadNotifications.map((notification) => (
+                  <li
+                    key={notification.id}
+                    className={getSeverityClassName(notification.severity)}
                   >
-                    Mark read
-                  </button>
-                ) : null}
-              </div>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-    </section>
+                    <div className="notification-item-body">
+                      <h3>{notification.title}</h3>
+                      <p className="data-list-meta">{notification.message}</p>
+                    </div>
+
+                    <div className="notification-item-actions" style={{ flexDirection: "column", gap: "0.25rem" }}>
+                      <Link to={notification.route ?? "/dashboard"} className="notification-link" onClick={() => setIsOpen(false)}>
+                        Go to
+                      </Link>
+                      <button
+                        type="button"
+                        className="notification-link"
+                        onClick={() => markAsRead(notification.id)}
+                      >
+                        Dismiss
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          
+          <div className="notification-dropdown-footer">
+            <Link className="btn btn-secondary" style={{ width: "100%" }} to="/notifications" onClick={() => setIsOpen(false)}>
+              View All History
+            </Link>
+            {browserPermission !== "granted" ? (
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ width: "100%", marginTop: "0.5rem" }}
+                onClick={requestBrowserPermission}
+              >
+                Enable Desktop Alerts
+              </button>
+            ) : null}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

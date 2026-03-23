@@ -62,7 +62,7 @@ function expectedCompletionDateByFrequency(today, frequency) {
   return isoDateFromDate(target);
 }
 
-function buildUpcomingDeadlineNotifications(tasks, now, horizonHours = 24) {
+function buildUpcomingDeadlineNotifications(tasks, now, horizonHours = 4) {
   const horizonMs = horizonHours * 60 * 60 * 1000;
   const nowMs = now.getTime();
 
