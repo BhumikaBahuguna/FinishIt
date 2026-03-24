@@ -7,12 +7,12 @@ The project currently ships as a React + Vite frontend that integrates directly 
 ## Core Features
 
 - Task management with CRUD workflows
-- Eisenhower matrix prioritization (urgent/important model)
+- Eisenhower matrix prioritization (urgent/important model) with distinct color-coded quadrants
 - Overdue task detection and deadline views
 - Habit tracking with daily logs and streak calculation
 - Dashboard with KPI and operational views
 - Analytics snapshots for completion and trend reporting
-- Notification engine for upcoming, overdue, missed-habit, and daily reminders
+- Subtle notification engine with a topbar bell widget, dropdown menu, and non-intrusive alerts
 - Google Calendar synchronization for task deadlines
 
 ## Tech Stack

@@ -33,11 +33,11 @@ Layers:
 
 ### Feature Modules
 
-* Tasks: CRUD, prioritization, overdue detection
+* Tasks: CRUD, prioritization with color-coded Eisenhower Matrix, overdue detection
 * Habits: logging and streak tracking
 * Dashboard: aggregated insights
 * Analytics: trends and KPIs
-* Notifications: derived event alerts
+* Notifications: derived event alerts, topbar bell widget with dropdown menu
 * Calendar: Google Calendar sync
 
 ---
