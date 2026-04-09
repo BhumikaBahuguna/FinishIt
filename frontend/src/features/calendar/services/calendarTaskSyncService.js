@@ -1,3 +1,10 @@
+/**
+ * calendarTaskSyncService.js — CALENDAR SYNC ORCHESTRATOR
+ *
+ * Coordinates between the Google Calendar API and the local Supabase
+ * task_calendar_sync table to keep event IDs tracking aligned.
+ */
+
 import { createOrUpdateTaskCalendarEvent } from "./googleCalendarApi";
 import { upsertTaskCalendarSyncEntry } from "./calendarSyncApi";
 import { isTaskUrgent } from "../../tasks/services/taskPrioritization";

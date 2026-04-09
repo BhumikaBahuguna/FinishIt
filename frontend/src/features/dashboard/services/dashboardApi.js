@@ -1,3 +1,13 @@
+/**
+ * dashboardApi.js — DASHBOARD DATA AGGREGATION
+ *
+ * Builds a comprehensive dashboard snapshot by combining data from
+ * tasks, habits, and habit logs into a single response.
+ *
+ * Returns: tasks, prioritized tasks, Eisenhower matrix, overdue tasks,
+ * upcoming deadlines, today's habit progress, and summary statistics.
+ */
+
 import { listHabitsByUser, listHabitLogsByHabitIds } from "../../habits/services/habitsApi";
 import { buildHabitProgressByHabit } from "../../habits/services/habitStreaks";
 import { listTasksByUser } from "../../tasks/services/tasksApi";

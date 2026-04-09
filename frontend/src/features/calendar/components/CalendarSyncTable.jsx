@@ -1,3 +1,4 @@
+/** CalendarSyncTable.jsx — Table listing syncable tasks and their calendar sync status */
 export function CalendarSyncTable({ tasks, syncByTaskId, onSyncTask, isSyncingTaskId }) {
   return (
     <div className="calendar-sync-table-wrapper">

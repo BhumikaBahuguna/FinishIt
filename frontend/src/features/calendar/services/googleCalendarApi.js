@@ -1,3 +1,11 @@
+/**
+ * googleCalendarApi.js — GOOGLE CALENDAR INTEGRATION
+ *
+ * Handles the OAuth flow using Google Identity Services to get access tokens,
+ * and calls the Google Calendar API to create, update, and delete events.
+ * Tokens are kept in memory (no backend storage for Google credentials).
+ */
+
 const GOOGLE_IDENTITY_SCRIPT_URL = "https://accounts.google.com/gsi/client";
 const CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.events";
 

@@ -1,3 +1,11 @@
+/**
+ * AnalyticsPage.jsx — ANALYTICS PAGE (/analytics)
+ *
+ * Displays productivity charts and statistics:
+ * KPI cards, task completion stats, habit streak summaries,
+ * overdue trend bar chart, and productivity overview chart.
+ */
+
 import { useEffect, useState } from "react";
 import { useAuth } from "../../auth/hooks/useAuth";
 import { PageHeader } from "../../../shared/components/ui/PageHeader";

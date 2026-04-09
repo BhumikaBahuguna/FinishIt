@@ -1,3 +1,10 @@
+/**
+ * CalendarIntegrationPage.jsx — CALENDAR PAGE (/calendar)
+ *
+ * Allows users to connect their Google Calendar and manually sync task
+ * deadlines as Google Calendar events with pop-up reminders.
+ */
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../auth/hooks/useAuth";
 import { listTasksByUser } from "../../tasks/services/tasksApi";

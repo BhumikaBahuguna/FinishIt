@@ -1,3 +1,10 @@
+/**
+ * validation.js — SHARED PAYLOAD VALIDATION
+ *
+ * Validates form inputs before sending them to Supabase.
+ * Enforces business rules (e.g. max title length of 200 chars).
+ */
+
 export const TASK_STATUSES = new Set(["pending", "in_progress", "completed", "archived"]);
 export const HABIT_FREQUENCIES = new Set(["daily", "weekly", "monthly", "custom"]);
 
@@ -18,29 +25,6 @@ export function isValidIsoDate(value) {
 
   const date = new Date(`${value}T00:00:00.000Z`);
   return !Number.isNaN(date.getTime());
-}
-
-function parseBoundedInteger(value, min, max) {
-  const parsed = Number(value);
-
-  if (!Number.isInteger(parsed)) {
-    return {
-      valid: false,
-      value: null
-    };
-  }
-
-  if (parsed < min || parsed > max) {
-    return {
-      valid: false,
-      value: null
-    };
-  }
-
-  return {
-    valid: true,
-    value: parsed
-  };
 }
 
 export function validateTaskPayload(taskInput, options = {}) {

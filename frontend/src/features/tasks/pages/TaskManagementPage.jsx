@@ -1,3 +1,15 @@
+/**
+ * TaskManagementPage.jsx — TASK MANAGEMENT PAGE (/tasks)
+ *
+ * Full task management interface with:
+ *   - Create/Edit task form (title, description, deadline, importance, status)
+ *   - Task list with edit, complete, and delete actions
+ *   - Overdue tasks section showing tasks past their deadline
+ *   - Eisenhower Matrix view with color-coded quadrants
+ *
+ * Urgency is auto-computed from the deadline (≤48h = urgent).
+ */
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../auth/hooks/useAuth";
 import { createTask, deleteTask, listTasksByUser, updateTask } from "../services/tasksApi";

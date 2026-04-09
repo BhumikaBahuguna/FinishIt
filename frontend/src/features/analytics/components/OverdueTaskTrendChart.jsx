@@ -1,3 +1,4 @@
+/** OverdueTaskTrendChart.jsx — 14-day bar chart showing daily overdue task counts */
 import { Card } from "../../../shared/components/ui/Card";
 
 export function OverdueTaskTrendChart({ points }) {

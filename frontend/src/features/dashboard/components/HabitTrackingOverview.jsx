@@ -1,3 +1,4 @@
+/** HabitTrackingOverview.jsx — Dashboard habit list with today's completion toggles and streaks */
 import { Card } from "../../../shared/components/ui/Card";
 
 export function HabitTrackingOverview({ habitsToday, onToggleHabit, isUpdatingHabit }) {

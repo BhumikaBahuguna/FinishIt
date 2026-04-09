@@ -1,3 +1,21 @@
+/**
+ * AppRouter.jsx — APPLICATION ROUTING
+ *
+ * Defines all the pages/URLs in the application using React Router.
+ *
+ * Route structure:
+ *   - /login (public) — Login page, redirects to dashboard if already logged in
+ *   - /dashboard (protected) — Main overview page
+ *   - /tasks (protected) — Create, edit, delete, and prioritize tasks
+ *   - /habits (protected) — Create and track daily habits
+ *   - /analytics (protected) — View productivity charts and statistics
+ *   - /calendar (protected) — Sync task deadlines to Google Calendar
+ *   - /notifications (protected) — View all alerts and reminders
+ *   - /* (catch-all) — Redirects unknown URLs to dashboard
+ *
+ * "Protected" means user must be logged in. "Public" means open to everyone.
+ */
+
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { MainLayout } from "../layouts/MainLayout";
 import { LoginPage } from "../../features/auth/pages/LoginPage";

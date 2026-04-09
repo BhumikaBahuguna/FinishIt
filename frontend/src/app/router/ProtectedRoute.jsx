@@ -1,3 +1,12 @@
+/**
+ * ProtectedRoute.jsx — AUTH GUARD FOR PROTECTED PAGES
+ *
+ * This component wraps all routes that require the user to be logged in.
+ * If the user is not authenticated, they get redirected to /login.
+ * If Supabase is not configured, it shows a configuration warning.
+ * While loading, it shows a loading indicator.
+ */
+
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../../features/auth/hooks/useAuth";
 

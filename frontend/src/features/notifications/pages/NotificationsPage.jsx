@@ -1,3 +1,10 @@
+/**
+ * NotificationsPage.jsx — NOTIFICATIONS PAGE (/notifications)
+ *
+ * Full notification history with KPI stats, refresh/mark-all-read buttons,
+ * and a scrollable list of all notifications with read/unread state.
+ */
+
 import { Link } from "react-router-dom";
 import { useNotifications } from "../hooks/useNotifications";
 import { PageHeader } from "../../../shared/components/ui/PageHeader";

@@ -1,3 +1,4 @@
+/** Button.jsx — Shared reusable button component */
 export function Button({
   children,
   type = "button",

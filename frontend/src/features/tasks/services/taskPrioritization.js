@@ -1,3 +1,19 @@
+/**
+ * taskPrioritization.js — EISENHOWER MATRIX ALGORITHM
+ *
+ * Implements the Eisenhower Matrix (urgent/important model) to classify and
+ * sort tasks into 4 quadrants:
+ *   1. DO FIRST (urgent + important) — Priority 1
+ *   2. SCHEDULE (important, not urgent) — Priority 2
+ *   3. DELEGATE (urgent, not important) — Priority 3
+ *   4. ELIMINATE (neither) — Priority 4
+ *
+ * A task is "urgent" if its deadline is within 48 hours or already past.
+ * A task is "important" if importance === true.
+ *
+ * Also provides getOverdueTasks() to find tasks past their deadline.
+ */
+
 const TERMINAL_TASK_STATUSES = new Set(["completed", "archived"]);
 
 const FORTY_EIGHT_HOURS_MS = 48 * 60 * 60 * 1000;

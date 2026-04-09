@@ -1,3 +1,11 @@
+/**
+ * NotificationProvider.jsx — NOTIFICATION STATE MANAGER
+ *
+ * Polls the notification engine every 60 seconds to refresh alerts.
+ * Manages notification state: list, read/unread tracking, browser notification
+ * permission, and unread count. Emits browser desktop notifications for info-level items.
+ */
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../../auth/hooks/useAuth";
 import {

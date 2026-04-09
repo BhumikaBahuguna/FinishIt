@@ -1,3 +1,13 @@
+/**
+ * userProfileApi.js — USER PROFILE SYNCHRONIZATION
+ *
+ * After a user authenticates via Supabase Auth, their profile data
+ * (id, email, name) needs to be synced into the public.users table.
+ * This file handles that "upsert" — insert if new, update if existing.
+ *
+ * Called by AuthProvider after every successful login.
+ */
+
 import { supabase } from "../../../services/supabase/client";
 
 function deriveDisplayName(user) {

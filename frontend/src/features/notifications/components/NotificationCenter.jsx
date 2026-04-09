@@ -1,3 +1,11 @@
+/**
+ * NotificationCenter.jsx — TOPBAR NOTIFICATION BELL WIDGET
+ *
+ * Renders a bell icon with unread badge count in the top bar.
+ * Clicking opens a dropdown showing unread notifications with dismiss/navigate actions.
+ * Includes a link to the full notifications page and browser permission request.
+ */
+
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useNotifications } from "../hooks/useNotifications";

@@ -1,3 +1,15 @@
+/**
+ * AuthProvider.jsx — AUTHENTICATION STATE MANAGER
+ *
+ * This provider manages the entire authentication lifecycle:
+ * 1. On mount: checks if user has an existing session (auto-login)
+ * 2. Subscribes to auth changes (login/logout events)
+ * 3. After login: syncs user profile to the public.users table
+ * 4. Exposes session, user, loading state, and auth functions to all components
+ *
+ * Data flow: Supabase Auth → AuthProvider state → useAuth() hook → components
+ */
+
 import { useEffect, useMemo, useState } from "react";
 import {
   getSession,

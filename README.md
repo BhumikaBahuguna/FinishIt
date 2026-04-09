@@ -24,9 +24,13 @@ The project currently ships as a React + Vite frontend that integrates directly 
 
 ## Documentation Map
 
-- System architecture: documentation/architecture/system-architecture.md
-- Database schema documentation: documentation/database/database-schema.md
-- Deployment guide (Vercel + Supabase): documentation/deployment/vercel-and-supabase.md
+- **PROJECT_GUIDE.txt**: High-level overview, architecture, and viva script.
+- **CODE_EXPLAINED.txt**: Detailed line-by-line explanation of the entire frontend source code.
+- **BACKEND_SUPABASE_GUIDE.txt**: Deep dive into the Supabase PostgreSQL database architecture.
+- System architecture: `documentation/architecture/system-architecture.md`
+- Database schema documentation: `documentation/database/database-schema.md`
+- Deployment guide: `documentation/deployment/vercel-and-supabase.md`
+- Project history and older plans: `documentation/project-history/`
 
 ## Setup and Installation
 
@@ -61,8 +65,9 @@ VITE_GOOGLE_CLIENT_ID=YOUR_GOOGLE_OAUTH_CLIENT_ID
 
 Run the SQL files in this order using Supabase SQL Editor:
 
-1. database/schema/tables/001_phase4_core_schema.sql
-2. database/migrations/001_calendar_task_sync.sql
+1. `database/schema/tables/001_phase4_core_schema.sql`
+2. `database/migrations/001_calendar_task_sync.sql`
+3. `database/migrations/002_urgency_importance_boolean.sql`
 
 ### 4. Start local development
 
@@ -83,18 +88,15 @@ npm run build
 - Database and authentication are hosted in Supabase
 - Full step-by-step deployment instructions are in: documentation/deployment/vercel-and-supabase.md
 
-## Future Improvements
+## Future Improvements (Phase 3)
 
+- **AI Integration**: Add an AI suggestion assistant that analyzes tasks/calendar and recommends exactly what the user should do first.
+- **Advanced Calendar Sync**: Complete the two-way Google Calendar integration (sync portion) so that modifying events in Google updates tasks in FinishIt.
 - Add Row Level Security (RLS) policies with strict tenant isolation for all tables
 - Add server-side business logic layer (Edge Functions or backend service) for sensitive operations
-- Add end-to-end tests for critical journeys (auth, task lifecycle, habit completion, calendar sync)
-- Add observability with structured logging and runtime error telemetry
-- Improve notification channel options (email/push) and user notification preferences
-- Add recurring task templates and custom habit recurrence rules
-- Add offline-first sync support and conflict resolution for weak connectivity
-- Add role-based collaboration features for shared productivity teams
 
 ## Project Status
 
 - Phases 1-11 implemented and validated
 - Phase 12 documentation completed
+- Refactoring and documentation cleanup (PROJECT_GUIDE, etc) completed

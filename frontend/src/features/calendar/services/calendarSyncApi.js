@@ -1,3 +1,10 @@
+/**
+ * calendarSyncApi.js — SUPABASE CALENDAR SYNC DB OPERATIONS
+ *
+ * Interacts with the task_calendar_sync table to track which tasks have been
+ * pushed to Google Calendar, storing the external event IDs.
+ */
+
 import { supabase } from "../../../services/supabase/client";
 
 function getClientOrThrow() {

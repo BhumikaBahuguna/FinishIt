@@ -1,3 +1,18 @@
+/**
+ * tasksApi.js — TASK CRUD OPERATIONS (Supabase)
+ *
+ * All database operations for tasks: list, create, update, delete.
+ * Each operation validates input, normalizes data, and records history.
+ *
+ * Data flow: Page component → tasksApi → Supabase PostgreSQL → response
+ *
+ * Functions:
+ *   listTasksByUser(userId) — fetch all tasks for a user
+ *   createTask(input) — validate, insert, and record history
+ *   updateTask(id, updates) — validate, update, and record history
+ *   deleteTask(id) — remove a task (cascades to history)
+ */
+
 import { supabase } from "../../../services/supabase/client";
 import { validateTaskPayload } from "../../../shared/utils/validation";
 

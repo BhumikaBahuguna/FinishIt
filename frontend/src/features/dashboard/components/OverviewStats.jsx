@@ -1,3 +1,4 @@
+/** OverviewStats.jsx — Dashboard KPI statistics grid (total tasks, overdue, habits done today) */
 import { Card } from "../../../shared/components/ui/Card";
 
 const STAT_CARDS = [

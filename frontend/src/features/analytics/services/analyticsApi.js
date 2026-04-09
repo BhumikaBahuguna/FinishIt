@@ -1,3 +1,13 @@
+/**
+ * analyticsApi.js — ANALYTICS DATA ENGINE
+ *
+ * Builds analytics snapshots from tasks and habits data:
+ *   - Task completion statistics (by status + completion rate)
+ *   - 14-day overdue task trend
+ *   - 7-day productivity overview (score = tasks×2 + habits)
+ *   - Habit streak summaries and rankings
+ */
+
 import { listHabitsByUser, listHabitLogsByHabitIds } from "../../habits/services/habitsApi";
 import { buildHabitProgressByHabit } from "../../habits/services/habitStreaks";
 import { getOverdueTasks } from "../../tasks/services/taskPrioritization";

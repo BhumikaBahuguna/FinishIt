@@ -1,3 +1,17 @@
+/**
+ * habitStreaks.js — HABIT STREAK CALCULATION
+ *
+ * Calculates consecutive-day streaks from habit completion logs.
+ *
+ * Algorithm:
+ *   1. Filter only completed logs with valid dates
+ *   2. Deduplicate and sort dates chronologically
+ *   3. Best streak: iterate forward, count consecutive days
+ *   4. Current streak: iterate backward from most recent date
+ *
+ * Returns { currentStreak, bestStreak, lastCompletedDate }
+ */
+
 function parseIsoDate(isoDate) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) {
     return null;

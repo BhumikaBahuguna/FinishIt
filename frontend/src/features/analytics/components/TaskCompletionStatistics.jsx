@@ -1,3 +1,4 @@
+/** TaskCompletionStatistics.jsx — Shows task counts by status + completion rate with progress bar */
 import { Card } from "../../../shared/components/ui/Card";
 
 export function TaskCompletionStatistics({ stats }) {

@@ -1,3 +1,10 @@
+/**
+ * PublicRoute.jsx — AUTH GUARD FOR PUBLIC PAGES (e.g., Login)
+ *
+ * If a user is already logged in and tries to access /login,
+ * this redirects them to /dashboard instead.
+ */
+
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../../features/auth/hooks/useAuth";
 

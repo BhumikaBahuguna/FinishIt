@@ -1,3 +1,4 @@
+/** HabitStreakSummary.jsx — Analytics view showing per-habit streak rankings and aggregate stats */
 import { Card } from "../../../shared/components/ui/Card";
 
 export function HabitStreakSummary({ habitStreakSummary }) {

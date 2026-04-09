@@ -1,3 +1,4 @@
+/** ProductivityOverviewChart.jsx — 7-day grouped bar chart comparing tasks vs habits completed */
 import { Card } from "../../../shared/components/ui/Card";
 
 export function ProductivityOverviewChart({ points, summary }) {

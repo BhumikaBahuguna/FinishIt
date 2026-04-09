@@ -1,3 +1,4 @@
+/** PageHeader.jsx — Uniform title and subtitle component for the top of each page */
 export function PageHeader({ title, subtitle }) {
   return (
     <header className="page-header">

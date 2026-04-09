@@ -1,3 +1,4 @@
+/** AppSidebar.jsx — Main navigation sidebar with links and sign out button */
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../../features/auth/hooks/useAuth";
 import { useNotifications } from "../../../features/notifications/hooks/useNotifications";

@@ -1,3 +1,16 @@
+/**
+ * notificationEngine.js — NOTIFICATION GENERATION ENGINE
+ *
+ * Generates 4 types of notifications from live data:
+ *   1. Upcoming deadlines (tasks due within 4 hours)
+ *   2. Overdue tasks (past deadline, not completed) — CRITICAL severity
+ *   3. Missed habits (not completed per frequency schedule) — WARNING severity
+ *   4. Daily reminder (summary of active tasks/habits, once per day) — INFO severity
+ *
+ * Notifications are sorted by severity (critical > warning > info) then recency.
+ * The daily reminder uses localStorage to prevent duplicate sends.
+ */
+
 import { listHabitsByUser, listHabitLogsByHabitIds } from "../../habits/services/habitsApi";
 import { buildHabitProgressByHabit, getTodayIsoDate } from "../../habits/services/habitStreaks";
 import { getOverdueTasks } from "../../tasks/services/taskPrioritization";

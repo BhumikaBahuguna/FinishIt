@@ -1,3 +1,4 @@
+/** Card.jsx — Shared UI container component with an optional title */
 export function Card({ title, children }) {
   return (
     <section className="card">

@@ -1,3 +1,4 @@
+/** UpcomingDeadlinesView.jsx — Dashboard section showing the next 5 approaching deadlines */
 import { Card } from "../../../shared/components/ui/Card";
 
 export function UpcomingDeadlinesView({ upcomingDeadlines }) {

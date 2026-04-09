@@ -1,3 +1,4 @@
+/** OverdueTaskView.jsx — Dashboard section listing tasks past their deadline */
 import { Card } from "../../../shared/components/ui/Card";
 
 export function OverdueTaskView({ overdueTasks }) {

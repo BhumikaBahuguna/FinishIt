@@ -1,3 +1,4 @@
+/** PrioritizedTaskSections.jsx — Eisenhower Matrix 4-quadrant task display for dashboard */
 import { Card } from "../../../shared/components/ui/Card";
 import { EISENHOWER_QUADRANTS } from "../../tasks/services/taskPrioritization";
 

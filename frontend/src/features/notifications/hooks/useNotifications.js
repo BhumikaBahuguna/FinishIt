@@ -1,3 +1,5 @@
+/** useNotifications.js — Hook providing notification state, unread count, and mark-as-read actions */
+
 import { useContext } from "react";
 import { NotificationContext } from "../context/NotificationContext";
 

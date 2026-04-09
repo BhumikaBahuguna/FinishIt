@@ -1,3 +1,15 @@
+/**
+ * habitsApi.js — HABIT CRUD OPERATIONS (Supabase)
+ *
+ * All database operations for habits and habit logs.
+ * Habits are recurring activities (daily, weekly, monthly, custom).
+ * Habit logs track daily completion status.
+ *
+ * Functions:
+ *   listHabitsByUser, createHabit, updateHabit, deleteHabit
+ *   listHabitLogs, listHabitLogsByHabitIds, upsertHabitLog
+ */
+
 import { supabase } from "../../../services/supabase/client";
 import {
   isValidIsoDate,

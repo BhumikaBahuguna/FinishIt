@@ -1,3 +1,13 @@
+/**
+ * DashboardPage.jsx — MAIN DASHBOARD PAGE (/dashboard)
+ *
+ * The primary landing page after login. Shows a unified overview of:
+ *   - KPI stats (total tasks, overdue, habits done today, etc.)
+ *   - Eisenhower Matrix with prioritized task sections
+ *   - Today's habit tracking with toggle checkboxes
+ *   - Overdue tasks and upcoming deadline warnings
+ */
+
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/hooks/useAuth";

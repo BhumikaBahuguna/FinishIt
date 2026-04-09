@@ -1,3 +1,11 @@
+/**
+ * HabitTrackingPage.jsx — HABIT TRACKING PAGE (/habits)
+ *
+ * Allows users to create recurring habits, mark daily completion,
+ * view streak statistics, and delete habits.
+ * Each habit shows current streak, best streak, and a today toggle.
+ */
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../auth/hooks/useAuth";
 import {

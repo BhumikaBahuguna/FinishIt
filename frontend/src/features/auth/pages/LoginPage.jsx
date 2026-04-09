@@ -1,3 +1,11 @@
+/**
+ * LoginPage.jsx — USER LOGIN PAGE
+ *
+ * Displays an email + password login form. On submit, calls Supabase Auth
+ * signInWithPassword. On success, navigates to /dashboard.
+ * Shows configuration warnings if Supabase env vars are missing.
+ */
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";

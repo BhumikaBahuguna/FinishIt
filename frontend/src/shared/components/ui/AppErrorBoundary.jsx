@@ -1,3 +1,4 @@
+/** AppErrorBoundary.jsx — Catches React rendering crashes to prevent the entire UI from going blank */
 import { Component } from "react";
 
 export class AppErrorBoundary extends Component {
