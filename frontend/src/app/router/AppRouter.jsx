@@ -25,6 +25,7 @@ import { HabitTrackingPage } from "../../features/habits/pages/HabitTrackingPage
 import { AnalyticsPage } from "../../features/analytics/pages/AnalyticsPage";
 import { NotificationsPage } from "../../features/notifications/pages/NotificationsPage";
 import { CalendarIntegrationPage } from "../../features/calendar/pages/CalendarIntegrationPage";
+import { LandingPage } from "../../features/landing/pages/LandingPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { PublicRoute } from "./PublicRoute";
 
@@ -32,13 +33,15 @@ export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Now always visible to everyone */}
+        <Route path="/" element={<LandingPage />} />
+
         <Route element={<PublicRoute />}>
           <Route path="/login" element={<LoginPage />} />
         </Route>
 
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/tasks" element={<TaskManagementPage />} />
             <Route path="/habits" element={<HabitTrackingPage />} />

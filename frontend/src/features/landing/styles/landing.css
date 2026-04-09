@@ -1,0 +1,240 @@
+/* landing.css — Creative Studio Neon Glass Aesthetic */
+
+.landing-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #000000;
+  font-family: "Outfit", "Inter", sans-serif;
+  overflow-x: hidden;
+}
+
+/* NAVBAR (Glass) */
+.landing-navbar {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 3rem;
+}
+
+.nav-brand .nav-logo {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #ffffff;
+  text-decoration: none;
+  letter-spacing: 1px;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav-link-subtle {
+  color: #ffffff;
+  opacity: 0.7;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  transition: opacity var(--transition-fast);
+}
+
+.nav-link-subtle:hover {
+  opacity: 1;
+}
+
+.nav-btn {
+  background: linear-gradient(135deg, #b975ff, #812fff);
+  color: #ffffff;
+  padding: 0.6rem 1.8rem;
+  letter-spacing: 1px;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 50px; /* Pill shape from ESTUDIO image */
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 0 15px rgba(185, 117, 255, 0.3);
+  font-weight: 600;
+}
+.nav-btn:hover {
+  box-shadow: 0 0 30px rgba(185, 117, 255, 0.6);
+  transform: scale(1.05);
+}
+
+/* HERO BLOCK (Branding y Diseño layout) */
+.hero-block {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  padding-top: 5rem;
+}
+
+.hero-subtitle {
+  color: #ffffff;
+  font-weight: 600;
+  letter-spacing: 4px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  z-index: 2;
+}
+
+/* Simulated 3D shapes using gradients & blur */
+.hero-glow-back {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(185,117,255,0.4) 0%, rgba(0,229,255,0.2) 50%, rgba(0,0,0,0) 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -70%);
+  filter: blur(40px);
+  z-index: 0;
+  animation: pulse 6s infinite alternate;
+}
+
+@keyframes pulse {
+  0% { transform: translate(-50%, -70%) scale(1); opacity: 0.7; }
+  100% { transform: translate(-50%, -70%) scale(1.1); opacity: 1; }
+}
+
+.hero-title {
+  color: #ffffff;
+  font-size: 6rem;
+  font-weight: 500;
+  line-height: 1.1;
+  margin: 0;
+  z-index: 2;
+}
+
+.text-gradient {
+  background: linear-gradient(90deg, #b975ff, #00e5ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+}
+
+.hero-cta-wrapper {
+  margin-top: 3rem;
+  z-index: 2;
+}
+
+/* VIDEO/STORY BLOCK */
+.story-block {
+  min-height: 80vh;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border-top: 2px solid #b975ff;  /* Purple accent line */
+  border-bottom: 2px solid #b975ff;
+}
+
+.story-bg-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.5; /* Darken the image so text pops */
+  filter: saturate(1.5); /* Moody aesthetic */
+}
+
+.story-text {
+  position: relative;
+  z-index: 2;
+  color: #b975ff; /* Exact match to the massive purple text */
+  font-family: "Times New Roman", Times, serif; /* Elegant serif */
+  font-size: 8rem;
+  line-height: 0.9;
+  text-align: center;
+  text-shadow: 0 10px 40px rgba(0,0,0,0.8);
+  font-weight: bold;
+}
+
+/* FEATURES SHOWCASE (Matching Leer / Ver / Usar image) */
+.showcase-block {
+  background-color: #f6efe8; /* Warm pale ivory from screenshot */
+  padding: 8rem 4rem;
+  text-align: center;
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.showcase-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.showcase-img-crop {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 40px 40px 10px 10px; /* Pillow-like rounded crop */
+  overflow: hidden;
+  margin-bottom: -3rem; /* Pull the orange text up into the image */
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.showcase-img-crop img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.showcase-display-text {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 7rem;
+  color: #ff6b00; /* Vivid orange */
+  font-weight: bold;
+  letter-spacing: -3px;
+  margin: 0;
+  position: relative;
+  z-index: 2;
+  text-shadow: 0 4px 10px rgba(255, 255, 255, 0.5); /* Subtle rim light to detach from photo */
+}
+
+.showcase-subtitle {
+  color: #ff6b00;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 1rem;
+}
+
+@media (max-width: 900px) {
+  .hero-title { font-size: 4rem; }
+  .story-text { font-size: 4.5rem; }
+  .showcase-grid { grid-template-columns: 1fr; gap: 6rem; }
+}

@@ -244,9 +244,12 @@ export function TaskManagementPage() {
   return (
     <div className="page-content">
       <PageHeader
-        title="Task Management"
-        subtitle="Create, organize, and prioritize your tasks."
+        title="Task Console"
+        subtitle="Organize, prioritize, and execute."
       />
+
+      <div className="split-dashboard">
+        <div className="dashboard-col-left">
 
       <Card title={editingTaskId ? "Edit Task" : "Create Task"}>
         {submitErrorMessage ? <p className="status-error">{submitErrorMessage}</p> : null}
@@ -325,6 +328,9 @@ export function TaskManagementPage() {
           </div>
         </form>
       </Card>
+      </div>
+      
+      <div className="dashboard-col-right">
 
       <Card title="Task List">
         {isLoading ? <p>Loading tasks...</p> : null}
@@ -411,6 +417,8 @@ export function TaskManagementPage() {
           ))}
         </section>
       </Card>
+      </div>
+      </div>
     </div>
   );
 }
