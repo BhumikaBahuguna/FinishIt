@@ -39,16 +39,30 @@ Purpose: The root component that composes the primary application layers.
 - Sets up `<PublicRoute>` for the Login page. 
 - Sets up `<ProtectedRoute>` for Dashboard, Tasks, Habits, etc.
 
-[ProtectedRoute.jsx]
-- Uses `const { user } = useAuth()`. If the user is undefined/null, it returns 
-  `<Navigate to="/login" />`, securely forcing unauthenticated users out of the app.
-- Returns `<Outlet />` if authenticated, which tells React Router to render the 
-  requested child page.
+[ProtectedRoute.jsx] & [PublicRoute.jsx]
+- `ProtectedRoute` uses `const { user } = useAuth()`. If undefined, it redirects 
+  to `/login`.
+- `PublicRoute` redirects authenticated users to `/dashboard`, leaving paths like 
+  `/` and `/login` open only to unauthenticated visitors.
 
 [MainLayout.jsx]
 - The visual "shell" of the app. It renders the `<AppSidebar>` on the left side, 
   and the `<Outlet />` on the right side. This ensures the sidebar never has to 
   reload when navigating between pages.
+
+--------------------------------------------------------------------------------
+2.1 PUBLIC PAGES & COMPONENTS (src/features/landing/ & src/shared/)
+--------------------------------------------------------------------------------
+
+[LandingPage.jsx]
+- Found in `/features/landing/pages/`. It acts as the public marketing face of 
+  FinishIt, showcasing features with an elegant, earthy hotel aesthetic.
+
+[Section.jsx] & [Navbar.jsx]
+- Found in `/shared/components/ui/` and `/navigation/`. 
+- `Section` acts as a macro-layout constraint, ensuring all LandingPage parts 
+  stay aligned perfectly in the center.
+- `Navbar` is a lightweight public navigation bar decoupled from the internal AppSidebar.
 
 --------------------------------------------------------------------------------
 3. SUPABASE CLIENT & AUTH API (src/services/supabase/)

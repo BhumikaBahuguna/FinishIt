@@ -97,13 +97,27 @@ F. DATA FLOW EXAMPLE (Creating a Task)
 5. The Supabase client sends securely formatted JSON to the PostgreSQL database.
 6. The UI awaits the response, clears the form, and re-fetches the updated list.
 
-G. CURRENT PROJECT STATUS
+G. HOMEPAGE & ROUTING
 --------------------------------------------------------------------------------
-The application is fully functional. The phase 2 UI updates have been completed, 
-including replacing annoying browser popups with a subtle Notification Bell 
-dropdown, and applying color-coded pastel themes to the Eisenhower Matrix.
+The application implements public and protected routing architectures:
+- `/` maps directly to the LandingPage for public visitors, featuring a premium 
+  marketing view.
+- `/login` is a `PublicRoute`, meaning users who are already logged in are seamlessly
+  redirected to their dashboard to prevent redundant logins.
+- `/dashboard` (and others) are wrapped in `ProtectedRoute`. Unauthenticated users 
+  are blocked and redirected to login.
 
-H. FUTURE PLAN (PHASE 3)
+H. CURRENT PROJECT STATUS
+--------------------------------------------------------------------------------
+The application is fully functional. The UI updates have been completed, 
+including:
+- Complete frontend redesign featuring a premium, hotel/lifestyle aesthetic with 
+  earthy green and beige colors.
+- A new public Landing page describing the features in an elegant layout.
+- Clean component architecture (`Section`, `Card`, `Navbar`) refactored for 
+  maximal readability and minimal complexity.
+- A subtle Notification Bell and color-coded statuses.
+I. FUTURE PLAN (PHASE 3)
 --------------------------------------------------------------------------------
 1. AI Integration: Add an AI suggestion assistant that analyzes the user's 
    current workload and calendar to recommend exactly which task they should 
@@ -115,7 +129,7 @@ H. FUTURE PLAN (PHASE 3)
 4. Security Hardening: Implement strict Row Level Security (RLS) policies inside 
    the Supabase database.
 
-I. VIVA PRESENTATION SCRIPT / KEY TALKING POINTS
+J. VIVA PRESENTATION SCRIPT / KEY TALKING POINTS
 --------------------------------------------------------------------------------
 "Welcome to FinishIt, a modern productivity application."
 "Instead of a standard to-do list, this app helps users *prioritize*."
@@ -128,7 +142,7 @@ database without the overhead of maintaining a custom Node.js server."
 "The standout feature is our Notification Engine — it derives alerts dynamically 
 from the user's data state, ensuring they are warned 4 hours before any deadline."
 
-J. EXPECTED Q&A
+K. EXPECTED Q&A
 --------------------------------------------------------------------------------
 Q: Why use Vite instead of Create-React-App?
 A: Create-React-App is deprecated and slow. Vite uses native ES modules, making 

@@ -6,6 +6,7 @@ The project currently ships as a React + Vite frontend that integrates directly 
 
 ## Core Features
 
+- Public Landing Page with a premium, aesthetic design showcasing the app features
 - Task management with CRUD workflows
 - Eisenhower matrix prioritization (urgent/important model) with distinct color-coded quadrants
 - Overdue task detection and deadline views
