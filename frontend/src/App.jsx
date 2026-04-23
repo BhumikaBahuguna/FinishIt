@@ -9,9 +9,9 @@
  * Think of it as: ErrorBoundary > Providers > Router > Pages
  */
 
-import { AppProviders } from "./app/providers/AppProviders";
-import { AppRouter } from "./app/router/AppRouter";
-import { AppErrorBoundary } from "./shared/components/ui/AppErrorBoundary";
+import { AppProviders } from "./providers/AppProviders";
+import { AppRouter } from "./router/AppRouter";
+import { AppErrorBoundary } from "./components/ui/AppErrorBoundary";
 
 export default function App() {
   return (

@@ -1,0 +1,159 @@
+================================================================================
+FinishIt - Project Guide
+================================================================================
+
+A. PROJECT OVERVIEW
+--------------------------------------------------------------------------------
+FinishIt is a comprehensive productivity and task management web application.
+Unlike traditional to-do lists, FinishIt integrates task tracking, habit 
+building, data analytics, and schedule synchronization into a single dashboard.   
+Its core philosophy revolves around the "Eisenhower Matrix" — a framework that 
+helps users categorize and prioritize tasks based on Urgency and Importance.
+
+Key Features:
+1. Eisenhower Matrix Prioritization (Urgent vs. Important)
+2. Task CRUD (Create, Read, Update, Delete) with deadlines
+3. Habit Tracking with consecutive-day streaks
+4. KPI Dashboard and visual Analytics
+5. Intelligent Notification Engine (warnings for overdue tasks, missed habits)
+6. Google Calendar Synchronization
+
+B. ARCHITECTURE
+--------------------------------------------------------------------------------
+FinishIt uses a modular "Client-Driven" architecture.
+There is no dedicated custom backend server (like Node.js or Python). Instead, 
+the React frontend communicates directly with Supabase via a secure Client API.
+
+Architecture Layers:
+- UI Layer: React Components (Pages, Sidebars, Cards)
+- State Layer: React Context (AuthProvider, NotificationProvider)
+- Domain/Service Layer: Business logic (tasksApi, habitStreaks, etc.)
+- Database Layer: Supabase PostgreSQL
+- External Integrations: Google Calendar API (OAuth2)
+
+C. TECHNOLOGY STACK
+--------------------------------------------------------------------------------
+Frontend:
+- React 18 (UI Library)
+- Vite 6 (Build Tool & Development Server)
+- React Router 6 (Client-side HTML routing)
+- Vanilla CSS (Custom styling, modern CSS variables, theming)
+
+Backend / BaaS (Backend-as-a-Service):
+- Supabase (PostgreSQL Database)
+- Supabase Auth (Email/Password Authentication)
+
+Integrations:
+- Google Identity Services (OAuth for Calendar)
+- Google Calendar API v3
+
+D. FOLDER STRUCTURE
+--------------------------------------------------------------------------------
+The project is organized using a "Feature-Based" folder structure.
+
+/frontend/src/
+  ├── app/          (Core app shells: Router, Providers, Layout)
+  ├── features/     (Self-contained functional domains)
+  │   ├── analytics/     (Charts and trend data)
+  │   ├── auth/          (Login and user session)
+  │   ├── calendar/      (Google Calendar sync)
+  │   ├── dashboard/     (KPIs and overview)
+  │   ├── habits/        (Recurring task logic)
+  │   ├── notifications/ (Alerts and topbar bell)
+  │   └── tasks/         (CRUD and prioritization)
+  ├── services/     (External clients like Supabase config)
+  ├── shared/       (Reusable buttons, cards, validation utils)
+  └── styles/       (Global CSS and themes)
+
+E. FEATURE BREAKDOWN & LOGIC
+--------------------------------------------------------------------------------
+1. Task Management & The Eisenhower Matrix
+Instead of a flat list, tasks are plotted into four quadrants:
+- Quadrant 1 (Do First): Urgent & Important.
+- Quadrant 2 (Schedule): Important but Not Urgent.
+- Quadrant 3 (Delegate): Urgent but Not Important.
+- Quadrant 4 (Eliminate): Neither Urgent nor Important.
+Logic: Urgency is mathematically calculated. If a deadline is less than 48 hours 
+away, `isUrgent` becomes true automatically. Importance is set manually.
+
+2. Habit Tracking & Streaks
+Habits are activities that happen regularly (e.g., daily). 
+Logic: The system calculates the "Current Streak" by looking backward from today 
+and counting how many consecutive days the habit log has `completed = true`.
+
+3. Notification Engine
+The system polls data every 60 seconds and derives alerts locally:
+- Checks for deadlines < 4 hours (Warning)
+- Checks for overdue tasks (Critical)
+- Checks for missed habits (Warning)
+These generate a visual blinking red dot on the sidebar bell icon.
+
+F. DATA FLOW EXAMPLE (Creating a Task)
+--------------------------------------------------------------------------------
+1. User types in "Submit Assignment" and clicks "Create" in TaskManagementPage.jsx.
+2. The UI checks validateTaskPayload() to ensure the title isn't blank and length is < 200.
+3. The UI extracts the user's ID from the `useAuth()` hook.
+4. The API function `createTask()` in tasksApi.js is called.
+5. The Supabase client sends securely formatted JSON to the PostgreSQL database.
+6. The UI awaits the response, clears the form, and re-fetches the updated list.
+
+G. HOMEPAGE & ROUTING
+--------------------------------------------------------------------------------
+The application implements public and protected routing architectures:
+- `/` maps directly to the LandingPage for public visitors, featuring a premium 
+  marketing view.
+- `/login` is a `PublicRoute`, meaning users who are already logged in are seamlessly
+  redirected to their dashboard to prevent redundant logins.
+- `/dashboard` (and others) are wrapped in `ProtectedRoute`. Unauthenticated users 
+  are blocked and redirected to login.
+
+H. CURRENT PROJECT STATUS
+--------------------------------------------------------------------------------
+The application is fully functional. The UI updates have been completed, 
+including:
+- Complete frontend redesign featuring a premium, hotel/lifestyle aesthetic with 
+  dark colors.
+- A new public Landing page describing the features in an elegant layout.
+- Clean component architecture (`Section`, `Card`, `Navbar`) refactored for 
+  maximal readability and minimal complexity.
+- A subtle Notification Bell and color-coded statuses.
+I. FUTURE PLAN (PHASE 3)
+--------------------------------------------------------------------------------
+1. AI Integration: Add an AI suggestion assistant that analyzes the user's 
+   current workload and calendar to recommend exactly which task they should 
+   do first.
+2. Advanced Sync: Complete the two-way Google calendar integration so that 
+   dragging an event in Google Calendar updates the task inside FinishIt.
+3. Backend Migration: Move the client-heavy logic (like computing overdue tasks) 
+   to Supabase Edge Functions for better performance on slow devices.
+4. Security Hardening: Implement strict Row Level Security (RLS) policies inside 
+   the Supabase database.
+
+J. VIVA PRESENTATION SCRIPT / KEY TALKING POINTS
+--------------------------------------------------------------------------------
+"Welcome to FinishIt, a modern productivity application."
+"Instead of a standard to-do list, this app helps users *prioritize*."
+"We implemented the Eisenhower Matrix, which dynamically sorts tasks based on 
+their deadlines and user-defined importance."
+"The architecture is modular. Everything is grouped by feature, making the code 
+scalable."
+"For the backend, we utilized Supabase, giving us a real relational PostgreSQL 
+database without the overhead of maintaining a custom Node.js server."
+"The standout feature is our Notification Engine — it derives alerts dynamically 
+from the user's data state, ensuring they are warned 4 hours before any deadline."
+
+K. EXPECTED Q&A
+--------------------------------------------------------------------------------
+Q: Why use Vite instead of Create-React-App?
+A: Create-React-App is deprecated and slow. Vite uses native ES modules, making 
+   the development server start instantly and builds significantly faster.
+
+Q: How is data secured if there's no backend?
+A: Supabase enforces security at the database level. Every request requires an 
+   authentication token, and Row Level Security (RLS) policies ensure users can 
+   only query their own data.
+
+Q: How do you calculate streaks?
+A: We fetch the historical logs for a habit, sort them chronologically, and iterate 
+   backward from the current date. If the sequence of days is uninterrupted, we 
+   increment the current streak counter.
