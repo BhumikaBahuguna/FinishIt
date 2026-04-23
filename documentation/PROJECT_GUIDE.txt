@@ -25,9 +25,9 @@ There is no dedicated custom backend server (like Node.js or Python). Instead,
 the React frontend communicates directly with Supabase via a secure Client API.
 
 Architecture Layers:
-- UI Layer: React Components (Pages, Sidebars, Cards)
-- State Layer: React Context (AuthProvider, NotificationProvider)
-- Domain/Service Layer: Business logic (tasksApi, habitStreaks, etc.)
+- UI Layer: React Components (Pages, Layouts, Components)
+- State Layer: React Context (Providers, Context, Hooks)
+- Domain/Service Layer: Business logic (services like tasksApi, habitStreaks, etc.)
 - Database Layer: Supabase PostgreSQL
 - External Integrations: Google Calendar API (OAuth2)
 
@@ -49,21 +49,19 @@ Integrations:
 
 D. FOLDER STRUCTURE
 --------------------------------------------------------------------------------
-The project is organized using a "Feature-Based" folder structure.
+The project is organized using a standard flattened React architecture.
 
 /frontend/src/
-  ├── app/          (Core app shells: Router, Providers, Layout)
-  ├── features/     (Self-contained functional domains)
-  │   ├── analytics/     (Charts and trend data)
-  │   ├── auth/          (Login and user session)
-  │   ├── calendar/      (Google Calendar sync)
-  │   ├── dashboard/     (KPIs and overview)
-  │   ├── habits/        (Recurring task logic)
-  │   ├── notifications/ (Alerts and topbar bell)
-  │   └── tasks/         (CRUD and prioritization)
-  ├── services/     (External clients like Supabase config)
-  ├── shared/       (Reusable buttons, cards, validation utils)
-  └── styles/       (Global CSS and themes)
+  ├── components/   (Reusable UI blocks: ui, navigation, dashboard, analytics)
+  ├── context/      (React Context definitions: AuthContext, etc.)
+  ├── hooks/        (Custom React hooks: useAuth, useNotifications)
+  ├── layouts/      (Visual shells: MainLayout)
+  ├── pages/        (Top-level screens: DashboardPage, TaskManagementPage)
+  ├── providers/    (Global state managers: AppProviders, AuthProvider)
+  ├── router/       (Navigation mapping: AppRouter, ProtectedRoute)
+  ├── services/     (External clients and business logic: APIs, Supabase)
+  ├── styles/       (Modular CSS: base, features, themes)
+  └── utils/        (Shared helper functions: validation.js)
 
 E. FEATURE BREAKDOWN & LOGIC
 --------------------------------------------------------------------------------
@@ -91,7 +89,7 @@ These generate a visual blinking red dot on the sidebar bell icon.
 F. DATA FLOW EXAMPLE (Creating a Task)
 --------------------------------------------------------------------------------
 1. User types in "Submit Assignment" and clicks "Create" in TaskManagementPage.jsx.
-2. The UI checks validateTaskPayload() to ensure the title isn't blank and length is < 200.
+2. The UI checks validation.js to ensure the title isn't blank and length is < 200.
 3. The UI extracts the user's ID from the `useAuth()` hook.
 4. The API function `createTask()` in tasksApi.js is called.
 5. The Supabase client sends securely formatted JSON to the PostgreSQL database.
@@ -112,11 +110,13 @@ H. CURRENT PROJECT STATUS
 The application is fully functional. The UI updates have been completed, 
 including:
 - Complete frontend redesign featuring a premium, hotel/lifestyle aesthetic with 
-  dark colors.
-- A new public Landing page describing the features in an elegant layout.
-- Clean component architecture (`Section`, `Card`, `Navbar`) refactored for 
-  maximal readability and minimal complexity.
+  dark colors and dynamic layouts.
+- Refactored folder architecture replacing deeply nested features with a standard, 
+  flattened structure (pages, components, services, etc.) for maximum readability.
+- Clean component architecture (`Section`, `Card`, `Navbar`) and highly modular 
+  CSS styling.
 - A subtle Notification Bell and color-coded statuses.
+
 I. FUTURE PLAN (PHASE 3)
 --------------------------------------------------------------------------------
 1. AI Integration: Add an AI suggestion assistant that analyzes the user's 
@@ -135,8 +135,8 @@ J. VIVA PRESENTATION SCRIPT / KEY TALKING POINTS
 "Instead of a standard to-do list, this app helps users *prioritize*."
 "We implemented the Eisenhower Matrix, which dynamically sorts tasks based on 
 their deadlines and user-defined importance."
-"The architecture is modular. Everything is grouped by feature, making the code 
-scalable."
+"The architecture is flattened and highly modular (pages, components, services), 
+making the code extremely readable and scalable."
 "For the backend, we utilized Supabase, giving us a real relational PostgreSQL 
 database without the overhead of maintaining a custom Node.js server."
 "The standout feature is our Notification Engine — it derives alerts dynamically 

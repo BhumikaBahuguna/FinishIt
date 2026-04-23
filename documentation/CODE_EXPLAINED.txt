@@ -23,39 +23,38 @@ Purpose: The root component that composes the primary application layers.
 - `<AppRouter>`: Determines which page component to display based on the URL.
 
 --------------------------------------------------------------------------------
-2. APPLICATION INFRASTRUCTURE (src/app/)
+2. APPLICATION INFRASTRUCTURE (src/providers/ and src/router/)
 --------------------------------------------------------------------------------
 
-[AppProviders.jsx]
+[frontend/src/providers/AppProviders.jsx]
 - Composes `<AuthProvider>` and `<NotificationProvider>`. Order is critical: 
   NotificationProvider needs the user's ID, so AuthProvider must wrap outside of it.
 
-[AppRouter.jsx]
-- Uses `react-router-dom` to map URLs to exact components.
+[frontend/src/router/AppRouter.jsx]
+- Uses `react-router-dom` to map URLs to exact components (pages).
 - Sets up `<PublicRoute>` for the Login page. 
 - Sets up `<ProtectedRoute>` for Dashboard, Tasks, Habits, etc.
 
-[ProtectedRoute.jsx] & [PublicRoute.jsx]
+[frontend/src/router/ProtectedRoute.jsx] & [frontend/src/router/PublicRoute.jsx]
 - `ProtectedRoute` uses `const { user } = useAuth()`. If undefined, it redirects 
   to `/login`.
 - `PublicRoute` redirects authenticated users to `/dashboard`, leaving paths like 
   `/` and `/login` open only to unauthenticated visitors.
 
-[MainLayout.jsx]
+[frontend/src/layouts/MainLayout.jsx]
 - The visual "shell" of the app. It renders the `<AppSidebar>` on the left side, 
   and the `<Outlet />` on the right side. This ensures the sidebar never has to 
   reload when navigating between pages.
 
 --------------------------------------------------------------------------------
-2.1 PUBLIC PAGES & COMPONENTS (src/features/landing/ & src/shared/)
+2.1 PUBLIC PAGES & COMPONENTS (src/pages/ and src/components/)
 --------------------------------------------------------------------------------
 
-[LandingPage.jsx]
-- Found in `/features/landing/pages/`. It acts as the public marketing face of 
-  FinishIt, showcasing features with an elegant aesthetic.
+[frontend/src/pages/LandingPage.jsx]
+- Acts as the public marketing face of FinishIt, showcasing features with an 
+  elegant aesthetic.
 
-[Section.jsx] & [Navbar.jsx]
-- Found in `/shared/components/ui/` and `/navigation/`. 
+[frontend/src/components/ui/Section.jsx] & [frontend/src/components/navigation/Navbar.jsx]
 - `Section` acts as a macro-layout constraint, ensuring all LandingPage parts 
   stay aligned perfectly in the center.
 - `Navbar` is a lightweight public navigation bar decoupled from the internal AppSidebar.
@@ -64,50 +63,52 @@ Purpose: The root component that composes the primary application layers.
 3. SUPABASE CLIENT & AUTH API (src/services/supabase/)
 --------------------------------------------------------------------------------
 
-[client.js]
+[frontend/src/services/supabase/client.js]
 - Reads `import.meta.env.VITE_SUPABASE_URL` to securely get the database address.
 - Calls `createClient(url, key)`. This object is exported and imported by EVERY 
   database file in the application to perform queries.
 - `persistSession: true` ensures that closing the tab doesn't log the user out.
 
-[authApi.js]
+[frontend/src/services/supabase/authApi.js]
 - Helper functions wrapper. `signInWithPassword()` runs `client.auth.signInWithPassword`.
 - `subscribeToAuthChanges()` is a listener that fires a callback automatically 
   whenever a user logs in, logs out, or their token expires.
 
 --------------------------------------------------------------------------------
-4. AUTHENTICATION FEATURE (src/features/auth/)
+4. AUTHENTICATION FEATURE (src/providers/ and src/pages/)
 --------------------------------------------------------------------------------
 
-[AuthProvider.jsx]
+[frontend/src/providers/AuthProvider.jsx]
 - Holds state: `user`, `session`, `isLoading`.
 - Inside `useEffect()`, it calls `getSession()` to check if the user is already 
   logged in when they open the app.
 - It provides these variables to the `AuthContext.Provider value={value}`. Any 
-  component in the app can access these variables without passing props.
+  component in the app can access these variables without passing props by using 
+  the `useAuth()` hook.
 
-[LoginPage.jsx]
+[frontend/src/pages/LoginPage.jsx]
 - A simple form. 
 - `onSubmit`: calls `signInWithPassword()`. If it fails, sets `errorMessage`. 
   If it succeeds, React Router automatically redirects to the ProtectedRoutes.
 
 --------------------------------------------------------------------------------
-5. TASKS FEATURE (src/features/tasks/)
+5. TASKS FEATURE (src/services/ and src/pages/)
 --------------------------------------------------------------------------------
 
-[tasksApi.js]
+[frontend/src/services/tasksApi.js]
 - Functions targeting the `tasks` SQL table.
 - `listTasksByUser(userId)`: Uses `client.from("tasks").select().eq("user_id", userId)`.
 - `createTask()`: Inserts a new row into the table.
 
-[taskPrioritization.js]
+[frontend/src/services/taskPrioritization.js]
 - The mathematical core of the Eisenhower Matrix.
 - `isTaskUrgent()`: Takes the task's deadline date, subtracts Date.now(), and 
   checks if the difference is less than 48 hours (in milliseconds).
 - `buildEisenhowerMatrix()`: Maps over an array of tasks and pushes them into 
   one of four arrays (DO_FIRST, SCHEDULE, DELEGATE, ELIMINATE) based on the 
   boolean values of `isUrgent` and `isImportant`.
-[TaskManagementPage.jsx]
+
+[frontend/src/pages/TaskManagementPage.jsx]
 - A monolithic page combining data listing and forms.
 - Uses `useState` for the form data: title, description, deadline.
 - When `loadTasks()` completes, it passes the data to `buildEisenhowerMatrix()`, 
@@ -115,26 +116,26 @@ Purpose: The root component that composes the primary application layers.
   in the UI.
 
 --------------------------------------------------------------------------------
-6. HABITS FEATURE (src/features/habits/)
+6. HABITS FEATURE (src/services/ and src/pages/)
 --------------------------------------------------------------------------------
 
-[habitStreaks.js]
+[frontend/src/services/habitStreaks.js]
 - `buildHabitProgressByHabit()`: This function takes a habit and an array of 
   all its `habit_logs`.
 - It sorts the logs purely by date.
 - It iterates backward from today. If `log.completed == true`, it `currentStreak++`. 
   The moment it hits a missing gap or a `false`, it stops.
 
-[HabitTrackingPage.jsx]
+[frontend/src/pages/HabitTrackingPage.jsx]
 - Displays a list of habits.
 - Each habit has a checkbox. Clicking the checkbox triggers `upsertHabitLog()`, 
   which inserts/updates the `habit_logs` SQL table for exactly "Today's Date".
 
 --------------------------------------------------------------------------------
-7. NOTIFICATIONS FEATURE (src/features/notifications/)
+7. NOTIFICATIONS FEATURE (src/services/, src/providers/, and src/components/)
 --------------------------------------------------------------------------------
 
-[notificationEngine.js]
+[frontend/src/services/notificationEngine.js]
 - `getNotificationsSnapshot()`: Fetches all tasks and habits from the database.
 - It filters for tasks where `deadline < 4 hours from now`. It wraps these in 
   an object with `type: "upcoming_task_deadline", severity: "warning"`.
@@ -142,26 +143,27 @@ Purpose: The root component that composes the primary application layers.
 - It concatenates all these arrays together and sorts them so critical alerts 
   appear at the top of the list.
 
-[NotificationProvider.jsx]
+[frontend/src/providers/NotificationProvider.jsx]
 - Uses `setInterval()` to fire the notification engine every 60,000 milliseconds (1 minute).
 - Maintains a `Set` of `readNotificationIds`.
 - Uses `publishNewNotifications()` which triggers browser popups for new items.
 
-[NotificationCenter.jsx]
+[frontend/src/components/notifications/NotificationCenter.jsx]
 - The bell widget in the top layout. 
 - Filters the global state `notifications.filter((n) => !n.isRead)`.
 - Counts the length of that array and displays a red badge. 
 - Renders a dropdown menu when `isOpen` is toggled.
 
 --------------------------------------------------------------------------------
-8. DASHBOARD OVERVIEW (src/features/dashboard/)
+8. DASHBOARD OVERVIEW (src/services/ and src/pages/)
 --------------------------------------------------------------------------------
 
-[dashboardApi.js]
+[frontend/src/services/dashboardApi.js]
 - Uses `Promise.all()` to fire `listHabitsByUser` and `listTasksByUser` at the 
   exact same time to speed up loading.
 - Pre-calculates KPI stats (total active tasks, total overdue).
 
-[DashboardPage.jsx]
-- Imports smaller UI components layout like `<OverviewStats />` and `<OverdueTaskView />`.
+[frontend/src/pages/DashboardPage.jsx]
+- Imports smaller UI components layout like `<OverviewStats />` and `<OverdueTaskView />`
+  from the `components/dashboard/` directory.
 - Connects the state from `dashboardApi` into the visual props of these components.

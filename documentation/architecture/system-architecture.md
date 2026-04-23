@@ -6,10 +6,10 @@ FinishIt follows a modular frontend architecture with client-driven backend inte
 
 Layers:
 
-* UI Layer: pages and reusable components
-* State Layer: Auth and Notification providers
-* Domain Layer: feature services (tasks, habits, analytics)
-* Data Access Layer: Supabase client wrappers
+* UI Layer: `pages` (orchestrators), `layouts` (shells), and `components` (reusable blocks)
+* State Layer: `providers`, `hooks`, and `context` managing React Context
+* Domain Layer: `services` (business logic for tasks, habits, analytics)
+* Data Access Layer: Supabase client wrappers (inside `services/supabase`)
 * Persistence Layer: Supabase PostgreSQL
 
 ---
@@ -19,26 +19,28 @@ Layers:
 ### Frontend App
 
 * React + Vite SPA
-* React Router for navigation
+* React Router for navigation (`router` folder)
 * Protected routes based on auth state
 
 ---
 
-### Providers
+### Providers & Global State
 
+* AppProviders: master wrapper
 * AuthProvider: manages session and user sync
 * NotificationProvider: handles polling and browser notifications
+* Hooks: `useAuth` and `useNotifications` for consuming state
 
 ---
 
-### Feature Modules
+### Domains & Services
 
-* Tasks: CRUD, prioritization with color-coded Eisenhower Matrix, overdue detection
-* Habits: logging and streak tracking
-* Dashboard: aggregated insights
-* Analytics: trends and KPIs
-* Notifications: derived event alerts, topbar bell widget with dropdown menu
-* Calendar: Google Calendar sync
+* Tasks: CRUD, prioritization with color-coded Eisenhower Matrix, overdue detection (`tasksApi.js`, `taskPrioritization.js`)
+* Habits: logging and streak tracking (`habitsApi.js`, `habitStreaks.js`)
+* Dashboard: aggregated insights (`dashboardApi.js`)
+* Analytics: trends and KPIs (`analyticsApi.js`)
+* Notifications: derived event alerts (`notificationEngine.js`)
+* Calendar: Google Calendar sync (`googleCalendarApi.js`, `calendarTaskSyncService.js`)
 
 ---
 
@@ -55,9 +57,9 @@ Layers:
 
 ### Task Flow
 
-1. UI triggers service function
-2. Service validates input
-3. Supabase query executes
+1. UI (`TaskManagementPage.jsx`) triggers service function
+2. Service validates input (`validation.js`)
+3. Supabase query executes (`tasksApi.js`)
 4. UI updates state
 
 ---
@@ -78,7 +80,7 @@ Layers:
 
 ---
 
-## 5. Security Model (NEW)
+## 5. Security Model
 
 * Supabase Auth handles authentication
 * Row Level Security ensures data isolation
