@@ -9,6 +9,7 @@
  *   - /tasks (protected) — Create, edit, delete, and prioritize tasks
  *   - /habits (protected) — Create and track daily habits
  *   - /analytics (protected) — View productivity charts and statistics
+ *   - /ai-assistant (protected) — AI-powered productivity assistant
  *   - /calendar (protected) — Sync task deadlines to Google Calendar
  *   - /notifications (protected) — View all alerts and reminders
  *   - /* (catch-all) — Redirects unknown URLs to dashboard
@@ -25,6 +26,7 @@ import { HabitTrackingPage } from "../pages/HabitTrackingPage";
 import { AnalyticsPage } from "../pages/AnalyticsPage";
 import { NotificationsPage } from "../pages/NotificationsPage";
 import { CalendarIntegrationPage } from "../pages/CalendarIntegrationPage";
+import { AIAssistantPage } from "../pages/AIAssistantPage";
 import { LandingPage } from "../pages/LandingPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { PublicRoute } from "./PublicRoute";
@@ -46,6 +48,7 @@ export function AppRouter() {
             <Route path="/tasks" element={<TaskManagementPage />} />
             <Route path="/habits" element={<HabitTrackingPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/ai-assistant" element={<AIAssistantPage />} />
             <Route path="/calendar" element={<CalendarIntegrationPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
           </Route>

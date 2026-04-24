@@ -10,6 +10,7 @@ const navigationItems = [
   { to: "/habits", label: "Habit Tracking" },
   { to: "/calendar", label: "Calendar Integration" },
   { to: "/analytics", label: "Analytics" },
+  { to: "/ai-assistant", label: "✦ AI Assistant" },
   { to: "/notifications", label: "Notifications" }
 ];
 
