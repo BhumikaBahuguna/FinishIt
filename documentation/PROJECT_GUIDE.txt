@@ -16,7 +16,8 @@ Key Features:
 3. Habit Tracking with consecutive-day streaks
 4. KPI Dashboard and visual Analytics
 5. Intelligent Notification Engine (warnings for overdue tasks, missed habits)
-6. Google Calendar Synchronization
+6. AI Productivity Assistant (Task Planning, Habit Analysis)
+7. Google Calendar Synchronization
 
 B. ARCHITECTURE
 --------------------------------------------------------------------------------
@@ -86,6 +87,12 @@ The system polls data every 60 seconds and derives alerts locally:
 - Checks for missed habits (Warning)
 These generate a visual blinking red dot on the sidebar bell icon.
 
+4. AI Productivity Assistant
+The application includes an embedded AI assistant using the Groq API (LLaMA 3). 
+Logic: It dynamically gathers all user data (tasks, habits, streaks, matrix priorities) 
+and injects it into a structured system prompt, allowing the AI to generate personalized 
+productivity plans and weekly summaries instantly.
+
 F. DATA FLOW EXAMPLE (Creating a Task)
 --------------------------------------------------------------------------------
 1. User types in "Submit Assignment" and clicks "Create" in TaskManagementPage.jsx.
@@ -119,12 +126,9 @@ including:
 
 I. FUTURE PLAN (PHASE 3)
 --------------------------------------------------------------------------------
-1. AI Integration: Add an AI suggestion assistant that analyzes the user's 
-   current workload and calendar to recommend exactly which task they should 
-   do first.
-2. Advanced Sync: Complete the two-way Google calendar integration so that 
+1. Advanced Sync: Complete the two-way Google calendar integration so that 
    dragging an event in Google Calendar updates the task inside FinishIt.
-3. Backend Migration: Move the client-heavy logic (like computing overdue tasks) 
+2. Backend Migration: Move the client-heavy logic (like computing overdue tasks) 
    to Supabase Edge Functions for better performance on slow devices.
 4. Security Hardening: Implement strict Row Level Security (RLS) policies inside 
    the Supabase database.
@@ -137,6 +141,9 @@ J. VIVA PRESENTATION SCRIPT / KEY TALKING POINTS
 their deadlines and user-defined importance."
 "The architecture is flattened and highly modular (pages, components, services), 
 making the code extremely readable and scalable."
+"We also integrated a lightning-fast AI Assistant using the Groq API. It dynamically 
+reads the user's current tasks and habit streaks to generate real-time, highly personalized 
+productivity plans."
 "For the backend, we utilized Supabase, giving us a real relational PostgreSQL 
 database without the overhead of maintaining a custom Node.js server."
 "The standout feature is our Notification Engine — it derives alerts dynamically 

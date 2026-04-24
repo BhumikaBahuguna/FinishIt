@@ -14,6 +14,7 @@ The project currently ships as a React + Vite frontend that integrates directly 
 - Dashboard with KPI and operational views
 - Analytics snapshots for completion and trend reporting
 - Subtle notification engine with a topbar bell widget, dropdown menu, and non-intrusive alerts
+- AI Productivity Assistant powered by Groq (LLaMA 3) for personalized task planning and habit analysis
 - Google Calendar synchronization for task deadlines
 
 ## Tech Stack
@@ -60,6 +61,7 @@ VITE_APP_NAME=FinishIt
 VITE_SUPABASE_URL=YOUR_SUPABASE_URL
 VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 VITE_GOOGLE_CLIENT_ID=YOUR_GOOGLE_OAUTH_CLIENT_ID
+VITE_GROQ_API_KEY=YOUR_GROQ_API_KEY
 ```
 
 ### 3. Apply database SQL in Supabase
@@ -91,13 +93,11 @@ npm run build
 
 ## Future Improvements (Phase 3)
 
-- **AI Integration**: Add an AI suggestion assistant that analyzes tasks/calendar and recommends exactly what the user should do first.
 - **Advanced Calendar Sync**: Complete the two-way Google Calendar integration (sync portion) so that modifying events in Google updates tasks in FinishIt.
 - Add Row Level Security (RLS) policies with strict tenant isolation for all tables
 - Add server-side business logic layer (Edge Functions or backend service) for sensitive operations
 
 ## Project Status
 
-- Phases 1-11 implemented and validated
-- Phase 12 documentation completed
+- Phases 1-12 implemented and validated (including full UI redesign and AI Assistant integration)
 - Refactoring and documentation cleanup (PROJECT_GUIDE, etc) completed

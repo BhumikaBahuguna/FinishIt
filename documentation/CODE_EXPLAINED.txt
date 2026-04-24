@@ -167,3 +167,24 @@ Purpose: The root component that composes the primary application layers.
 - Imports smaller UI components layout like `<OverviewStats />` and `<OverdueTaskView />`
   from the `components/dashboard/` directory.
 - Connects the state from `dashboardApi` into the visual props of these components.
+
+--------------------------------------------------------------------------------
+9. AI ASSISTANT FEATURE (src/services/ and src/pages/)
+--------------------------------------------------------------------------------
+
+[frontend/src/services/aiAssistantApi.js]
+- Acts as the bridge between the application's data and the Groq (LLaMA 3) API.
+- `gatherUserContext()`: Aggregates tasks, habits, matrix data, and recent completions 
+  into a comprehensive JSON object.
+- `buildSystemPrompt()`: Translates the JSON context into a structured text prompt 
+  that guides the AI's persona and awareness.
+- `sendAIMessage()`: Performs a fetch request to the OpenAI-compatible Groq endpoint 
+  and returns the parsed AI response or error.
+
+[frontend/src/pages/AIAssistantPage.jsx]
+- A dedicated chat interface with a premium, glassmorphic design.
+- Uses `useState` to maintain a history of user/assistant messages.
+- Implements `renderFormattedContent()` to parse markdown-like responses (bold text, 
+  headers, code blocks) directly in React.
+- Provides "Quick Action" buttons that trigger pre-defined, high-value prompts 
+  (e.g., "Plan My Tasks").
