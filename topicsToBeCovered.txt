@@ -1,0 +1,128 @@
+====================================================================
+FINISHIT - MASTER STUDY SYLLABUS (topicsToBeCovered.txt)
+====================================================================
+
+1. PROJECT ARCHITECTURE TOPICS
+--------------------------------------------------------------------
+- High-level Client-Server Architecture
+- The Role of Supabase (Backend-as-a-Service)
+- Frontend Folder Structure (pages, components, context, services, hooks)
+- Component interactions and Component Tree (App -> Providers -> Router -> Layout -> Pages -> Components)
+- Authentication Flow (Supabase Auth -> AuthContext -> Protected Routes)
+- Request lifecycle (Client -> Service API -> Supabase/Groq/Google API -> Response -> State Update -> Re-render)
+- API Integration Architecture (Separation of Concerns via `services/`)
+- System design concepts: Single Source of Truth, Separation of Concerns, Controlled vs Uncontrolled Components, JWT-based Sessions
+
+2. FRONTEND TOPICS
+--------------------------------------------------------------------
+[React Fundamentals]
+- Virtual DOM and Reconciliation
+- Component Lifecycle (Mounting, Updating, Unmounting)
+- Functional Components vs Class Components (Why functional?)
+- React Hooks in depth: useState, useEffect, useContext, useMemo, custom hooks
+- Prop Drilling and how Context API solves it
+- State Management (Local component state vs Context state)
+- Controlled components (Forms) vs Uncontrolled components
+
+[Routing (React Router DOM v6)]
+- BrowserRouter, Routes, Route
+- Protected vs Public Routes (Route Guards)
+- Navigate and useNavigate hook
+- Outlet (for MainLayout)
+
+[CSS & Styling]
+- Vanilla CSS architecture (base, components, features, layout, themes)
+- CSS Variables (Custom Properties) for Theme Management
+- Flexbox vs CSS Grid (used in Eisenhower Matrix / Dashboard)
+- Media Queries and Responsive Design Principles
+- Semantic HTML tags used
+
+[JavaScript Concepts in React]
+- ES6 Modules (import/export)
+- Asynchronous JavaScript: Promises, async/await, fetch API
+- Array methods heavily used: map, filter, reduce, sort, find, some
+- Object and Array Destructuring
+- Spread and Rest operators
+- Optional Chaining (?.) and Nullish Coalescing (??)
+- Error Handling (try/catch/finally)
+- Closures in Event Handlers
+
+3. BACKEND & API TOPICS
+--------------------------------------------------------------------
+- Supabase Architecture (PostgREST API, GoTrue Auth)
+- How Supabase generates REST APIs directly from PostgreSQL schemas
+- JWT (JSON Web Tokens) and how Supabase manages sessions
+- Groq API Integration (LLaMA 3 model, system prompts, role-based chat completion)
+- External API calls using `fetch`
+- Google Calendar API Sync Concepts (OAuth tokens, Event IDs, two-way vs one-way sync logic)
+
+4. DATABASE TOPICS
+--------------------------------------------------------------------
+- PostgreSQL Relational Model
+- Supabase Auth schema (`auth.users`) vs Public schema (`public.users`)
+- Database Normalization
+- Table Structures: users, tasks, habits, habit_logs, task_history, task_calendar_sync
+- Data Types used: uuid, timestamptz, varchar, text, boolean, smallint, enum
+- PostgreSQL Enums (task_status, habit_frequency)
+- Primary Keys (UUID) and Foreign Keys (ON DELETE CASCADE)
+- Database Constraints: UNIQUE, CHECK constraints (e.g., email validation, non-blank titles)
+- Database Triggers and Functions (e.g., `set_updated_at`)
+- Database Indexing (Why `idx_tasks_user_id`, `idx_habits_user_active` exist)
+- SQL vs NoSQL Tradeoffs (Why Postgres over MongoDB?)
+- Row Level Security (RLS) - Concept and future implementation
+
+5. SYNTAX-LEVEL TOPICS
+--------------------------------------------------------------------
+- `useEffect(() => { ... return () => {...} }, [deps])` syntax and cleanup functions
+- `const [state, setState] = useState(initial)` syntax
+- `async function fetchData() { try { const res = await api(); } catch(e) {} }`
+- Arrow functions vs Regular functions
+- Implicit returns in arrow functions: `tasks.map(t => ({ id: t.id }))`
+- Ternary operators: `condition ? true : false`
+- Logical AND (&&): `isError && <ErrorComponent />`
+- Destructuring props: `function Card({ title, children }) { ... }`
+- Supabase SDK syntax: `supabase.from('tasks').select('*').eq('user_id', id)`
+- Template literals: `Bearer ${GROQ_API_KEY}`
+
+6. VIVA QUESTIONS PREPARATION TOPICS
+--------------------------------------------------------------------
+[Beginner]
+- What does this app do?
+- Why did you use React?
+- What is Vite and why not Create React App?
+- Explain what `useState` does here.
+- How do you create a new component?
+
+[Intermediate]
+- How does the login system work?
+- What happens when a user clicks "Add Task"? Explain the end-to-end flow.
+- How did you implement the Eisenhower Matrix logic?
+- Why did you separate API calls into a `services` folder?
+- How does the AuthContext prevent unauthorized access?
+- Explain the `useEffect` dependency array. What happens if you leave it empty?
+
+[Advanced / Trap Questions]
+- "Why use Supabase instead of writing your own Express.js backend?"
+- "What happens if two users log in on the same browser in different tabs?"
+- "Your `useEffect` is causing an infinite loop. Why does that happen and how do you fix it?"
+- "Explain how the Groq AI API handles prompt injection or halluncination."
+- "If the Supabase API goes down, what happens to your frontend?"
+- "Why are you syncing public users with auth users? Is that secure?"
+
+7. ADVANCED TOPICS EVALUATOR MIGHT ASK
+--------------------------------------------------------------------
+- Scalability: "What if 1 million users join?" (Database connections, connection pooling, pagination)
+- Security Hardening: XSS protection in React, JWT security, Row Level Security (RLS) in Supabase.
+- State Management Tradeoffs: Context API vs Redux vs Zustand.
+- Performance Optimization: Memoization (useMemo, React.memo), Code Splitting, Lazy Loading.
+- Production Deployment: Vercel serverless architecture, CI/CD pipelines, Environment variables security.
+
+8. IMPROVEMENT / EXTENSION TOPICS
+--------------------------------------------------------------------
+- Implementing proper Row Level Security (RLS) in Supabase.
+- Two-way Google Calendar synchronization (currently only local-to-remote).
+- Moving heavy AI prompt generation to a secure Edge Function/Backend to protect the Groq API key.
+- Adding WebSockets for real-time collaboration.
+- Implementing robust form validation (Zod/Yup) instead of manual checks.
+- Adding PWA (Progressive Web App) support for offline capability.
+- Implementing Pagination/Infinite Scroll for tasks and habit logs.

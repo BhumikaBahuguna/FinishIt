@@ -1,0 +1,156 @@
+{
+  "files": {
+    "transpiler/semantic/analyzer.py": {
+      "what": "The semantic analyzer is the \"logic checker\". It goes through the AST and checks that the program's meaning is valid. It ensures variables are declared before use, types match in operations, and functions are called with correct arguments.",
+      "why": "The parser only checks if the structure is correct, not if the code makes sense. For example, `print(z)` is structurally correct, but if `z` doesn't exist, it's a semantic error. This file catches those logic errors before we try to generate target code.",
+      "blocks": [
+        {
+          "start": 1,
+          "end": 26,
+          "desc": "Module Docstring & Imports",
+          "what": "Explains the two-pass design and scope stack. Imports the required AST nodes and error classes.",
+          "why": "To document the architecture at the top. The fallback imports handle both direct execution and module execution.",
+          "breaks": "Without these imports, the analyzer cannot read the AST or raise errors.",
+          "viva": "Why do we need a two-pass design for Python?",
+          "answer": "In Python, you can call a function before it is defined. A single pass would throw an 'Undeclared function' error. Two passes allow us to collect all function signatures first."
+        },
+        {
+          "start": 29,
+          "end": 47,
+          "desc": "SemanticAnalyzer.analyze method",
+          "what": "The main entry point. Sets up the scope stack, chooses one or two passes based on language, and returns the annotated program and symbol table.",
+          "why": "It initializes all the tracking structures (`scope_stack`, `functions`, `errors`) and cleanly orchestrates the analysis passes.",
+          "breaks": "The pipeline wouldn't be able to start semantic analysis.",
+          "viva": "What happens if errors are found during analysis?",
+          "answer": "They are collected in `self.errors`. At the end of the method, if the list is not empty, it raises a `CompilerErrorList` to stop the pipeline."
+        },
+        {
+          "start": 49,
+          "end": 80,
+          "desc": "Scope Helpers (_enter_scope, _exit_scope, _declare, _lookup)",
+          "what": "Functions to manage the scope stack. They push/pop dictionaries and look up variables from innermost to outermost scope.",
+          "why": "To implement local vs global variables. A variable in an inner scope \"shadows\" one in an outer scope.",
+          "breaks": "Variable lookup would fail or all variables would be global, causing false 'redeclaration' errors.",
+          "viva": "How does `_lookup` work?",
+          "answer": "It searches the `scope_stack` list in reverse order. It checks the current local scope first, and if not found, it checks the outer scopes until it hits the global scope."
+        },
+        {
+          "start": 82,
+          "end": 98,
+          "desc": "Pass 1: Collect signatures",
+          "what": "Iterates over all functions in the program and registers their names, parameters, and return types in the global scope.",
+          "why": "To allow forward references in Python. It records the signature so `_resolve_call` can verify arguments even if the function body hasn't been analyzed yet.",
+          "breaks": "Calling a function before it's defined in Python would incorrectly cause an 'Undeclared function' error.",
+          "viva": "Does Pass 1 analyze the code inside the function?",
+          "answer": "No, it only looks at the function definition (name and parameters). The body is analyzed later."
+        },
+        {
+          "start": 100,
+          "end": 127,
+          "desc": "Pass 2 and Single Pass",
+          "what": "Pass 2 analyzes global statements first, then function bodies. Single pass does it sequentially.",
+          "why": "Analyzing globals first allows function calls in globals to trigger on-demand body analysis, which infers types.",
+          "breaks": "Type inference for function parameters would fail if bodies were analyzed before the calls.",
+          "viva": "Why analyze global statements before function bodies?",
+          "answer": "Because a global function call provides the actual argument types, which we can use to infer the parameter types of the function before analyzing its body."
+        },
+        {
+          "start": 129,
+          "end": 162,
+          "desc": "_analyze_func_body",
+          "what": "Analyzes the code inside a function. Pushes a new scope, declares parameters, analyzes the body statements, and determines the return type.",
+          "why": "It isolates the function's variables in their own scope. It tracks `ReturnStmt` nodes to figure out what type the function returns.",
+          "breaks": "Function parameters wouldn't exist in scope, and the function's return type would remain UNKNOWN.",
+          "viva": "How do you determine a function's return type?",
+          "answer": "We walk through its body and look for `ReturnStmt` nodes. We resolve the type of the returned value and set that as the function's return type."
+        },
+        {
+          "start": 164,
+          "end": 285,
+          "desc": "Statement Dispatch and Handlers",
+          "what": "A series of methods like `_do_if`, `_do_assign`, `_do_for_range` that validate specific statement types.",
+          "why": "Each statement has different semantic rules. For example, an `if` condition must be checked, and a `for` loop needs its own scope for the loop variable.",
+          "breaks": "The analyzer wouldn't know how to validate different language constructs.",
+          "viva": "How do you handle silent promotion in assignments?",
+          "answer": "In `_do_assign`, if the variable is an INT and the assigned value is a FLOAT, we silently update the variable's type to FLOAT in the symbol table."
+        },
+        {
+          "start": 287,
+          "end": 354,
+          "desc": "Expression Type Resolution",
+          "what": "Methods like `_resolve_binop` and `_resolve_call` that recursively determine the resulting DataType of expressions.",
+          "why": "To check if operations are valid (like preventing adding a string to an int) and to determine what type an assignment or function call produces.",
+          "breaks": "The analyzer wouldn't know the types of complex expressions, causing type checking to fail.",
+          "viva": "How does `_resolve_binop` handle `==`?",
+          "answer": "It sees that the operator is a comparison operator, so it immediately returns `DataType.BOOL` regardless of the operand types."
+        },
+        {
+          "start": 356,
+          "end": 366,
+          "desc": "_promote type promotion rules",
+          "what": "Defines how types combine in arithmetic (e.g., INT + FLOAT = FLOAT).",
+          "why": "To correctly model how programming languages upgrade types during math operations.",
+          "breaks": "Math with mixed types would incorrectly result in UNKNOWN or INT types.",
+          "viva": "What is the result of INT + FLOAT?",
+          "answer": "It promotes the result to FLOAT, so that decimal precision isn't lost during the operation."
+        }
+      ]
+    },
+    "transpiler/ir/ir_generator.py": {
+      "what": "The IR Generator validates the structural integrity of the AST and converts it into a JSON-serializable dictionary.",
+      "why": "We need to ensure the AST is perfectly formed before sending it to the code generators. Also, the frontend UI needs a JSON version of the tree to display it to the user.",
+      "blocks": [
+        {
+          "start": 1,
+          "end": 30,
+          "desc": "Module Docstring & Imports",
+          "what": "Explains why we use the AST as our IR instead of TAC or LLVM IR, and imports all AST nodes.",
+          "why": "To document the architectural decision of keeping a 'neutral AST' to preserve program structure.",
+          "breaks": "Without imports, we can't do isinstance checks on the AST nodes.",
+          "viva": "Why use the AST as IR instead of Three-Address Code (TAC)?",
+          "answer": "TAC flattens the structure, making it hard to generate readable C/C++ code. Our neutral AST preserves high-level constructs like 'for' loops and 'if' statements."
+        },
+        {
+          "start": 33,
+          "end": 49,
+          "desc": "IRGenerator.generate method",
+          "what": "The entry point for validation. It iterates through all functions and globals and checks their structure.",
+          "why": "It acts as a final gatekeeper. If the AST passes this, we guarantee it's safe for code generation.",
+          "breaks": "Broken ASTs (e.g. missing condition in an IfStmt) would crash the code generators.",
+          "viva": "Does this method modify the AST?",
+          "answer": "No, it returns the exact same Program object unchanged. Its only job is to validate integrity and raise errors if it finds violations."
+        },
+        {
+          "start": 51,
+          "end": 100,
+          "desc": "_check_function and _check_node",
+          "what": "Recursively dispatches validation to specific methods based on the node type using `isinstance`.",
+          "why": "It ensures every single node in the entire tree is visited and validated.",
+          "breaks": "Sub-nodes inside blocks or expressions wouldn't be checked for structural integrity.",
+          "viva": "What does `_check_node(None)` do?",
+          "answer": "It simply returns. `None` is valid for optional fields like the value of a `ReturnStmt`."
+        },
+        {
+          "start": 102,
+          "end": 210,
+          "desc": "Individual Node Checkers (_chk_*)",
+          "what": "Specific rules for each node type. For example, `IfStmt` must have a condition, `ForRangeStmt` must have a stop value.",
+          "why": "Each construct has mandatory parts. These methods enforce the exact structural requirements.",
+          "breaks": "Nodes missing required fields would slip through to code generation and cause crashes.",
+          "viva": "What is the validation rule for a `BinaryOp`?",
+          "answer": "It must have a non-empty operator string, and it must have both a left and a right operand node."
+        },
+        {
+          "start": 212,
+          "end": 295,
+          "desc": "JSON serialization (to_dict and _n2d)",
+          "what": "Recursively converts the Python AST dataclass objects into a standard Python dictionary.",
+          "why": "Python objects cannot be sent over the network. We must convert them to a dictionary so the Flask backend can send them as JSON to the frontend UI.",
+          "breaks": "The UI would not be able to display the 'IR Tree' modal to the user.",
+          "viva": "How are Enums handled in `_n2d`?",
+          "answer": "They are converted to strings using `.value`, because JSON does not natively support Python Enum objects."
+        }
+      ]
+    }
+  }
+}
