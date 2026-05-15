@@ -164,3 +164,34 @@ Q: How do you calculate streaks?
 A: We fetch the historical logs for a habit, sort them chronologically, and iterate 
    backward from the current date. If the sequence of days is uninterrupted, we 
    increment the current streak counter.
+
+Q: How does the application handle state management without Redux?
+A: We use React Context (AuthContext, NotificationContext) and custom hooks. This 
+   provides a lightweight way to share global state like authentication and 
+   notifications without the overhead and boilerplate of Redux.
+
+Q: What is the significance of the 48-hour threshold for task urgency?
+A: This is part of our Eisenhower Matrix implementation. If a task is due in 
+   less than 48 hours, it's automatically flagged as "Urgent" to encourage 
+   immediate action, helping users focus on upcoming deadlines.
+
+Q: How does the Notification Engine ensure alerts stay up-to-date?
+A: It uses a polling-based system. The NotificationProvider runs the engine every 
+   60 seconds using `setInterval`, checking for upcoming deadlines (<4 hours) 
+   and overdue tasks, then updating the UI state and triggering the visual bell.
+
+Q: Why use Vanilla CSS instead of a framework like Tailwind?
+A: Vanilla CSS with modern features (CSS Variables, Flexbox/Grid) allows for 
+   absolute control over the "premium/hotel lifestyle" aesthetic. It avoids 
+   the "generic" look of many frameworks and keeps the CSS bundle highly 
+   optimized.
+
+Q: How does the AI Assistant provide personalized advice?
+A: Before calling the Groq API, the service gathers the user's real-time data 
+   (tasks, habits, streaks). This context is injected into a structured System 
+   Prompt, allowing the AI to "see" the user's current productivity state.
+
+Q: What happens if Google Calendar synchronization fails?
+A: We track sync status in the `task_calendar_sync` table. Error handlers in the 
+   service layer catch API failures, allowing the UI to notify the user without 
+   corrupting the primary task data in Supabase.
