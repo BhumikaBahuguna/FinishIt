@@ -1,0 +1,422 @@
+====================================================================
+FINISHIT — COMPLETE CODEBASE EXPLANATION & ARCHITECTURAL MANUAL
+====================================================================
+
+This document provides a deep, serial-wise walkthrough of every code file in the FinishIt repository. It is designed to transform a "vibe-coded" understanding into senior-level technical ownership.
+
+--------------------------------------------------------------------
+MENTAL MODEL: THE LAYERS OF FINISHIT
+--------------------------------------------------------------------
+FinishIt is a "Thick Client" Single Page Application (SPA).
+1. UI LAYER (JSX): React components (pages/components) render the view.
+2. STATE LAYER (Context): Global states like Auth and Notifications.
+3. LOGIC LAYER (Services): Data fetching, normalization, and algorithms (Eisenhower Matrix, Streaks).
+4. DATABASE LAYER (PostgreSQL): Data persistence with strict relational integrity.
+
+==================================================
+FILE 1: frontend/package.json
+==================================================
+1. File Purpose: The project's manifest. Defines dependencies, scripts, and metadata.
+2. Theory: Node.js ecosystem uses this to manage libraries. "dependencies" are needed for production; "devDependencies" only for building/linting.
+3. Code Walkthrough:
+   - "type": "module" -> Enables modern ES Modules (import/export).
+   - "dependencies": Includes @supabase/supabase-js (DB), react (UI), react-router-dom (URLs).
+   - "scripts": "dev" starts Vite; "build" creates a production-ready bundle.
+4. Connection: Controls every other frontend file by managing their imports.
+5. Interview: "What's the difference between package.json and package-lock.json?" (A: Lock file ensures exact versions across all environments).
+
+==================================================
+FILE 2: frontend/vite.config.js
+==================================================
+1. File Purpose: Configuration for the Vite build tool.
+2. Theory: Vite is a build tool that uses Native ES Modules to provide near-instant hot module replacement (HMR).
+3. Code Walkthrough:
+   - react(): The plugin that enables JSX transformation and React-specific optimizations.
+   - port: 5173: Sets the local development server address.
+4. Connection: Reads .env files and processes all .jsx files.
+
+==================================================
+FILE 3: frontend/src/main.jsx
+==================================================
+1. File Purpose: The execution entry point for the browser.
+2. Theory: "Hydration" or "Mounting". It finds a DOM node and "injects" the React app.
+3. Walkthrough:
+   - Imports main.css (global styles).
+   - ReactDOM.createRoot: Creates the React root.
+   - <React.StrictMode>: Wraps the app to catch bugs during development.
+4. Connection: index.html -> main.jsx -> App.jsx.
+
+==================================================
+FILE 4: frontend/src/App.jsx
+==================================================
+1. File Purpose: The Root Component.
+2. Theory: Component Composition. It doesn't contain UI logic; it "assembles" the global structure.
+3. Walkthrough:
+   - Wraps everything in AppErrorBoundary (safety).
+   - Wraps children in AppProviders (state).
+   - Renders AppRouter (navigation).
+4. Connection: The parent of the entire UI tree.
+
+==================================================
+FILE 5: frontend/src/providers/AppProviders.jsx
+==================================================
+1. File Purpose: Composes multiple Context Providers.
+2. Theory: Provider Nesting. Order matters! NotificationProvider depends on AuthProvider (to know the user).
+3. Walkthrough:
+   - AuthProvider wraps NotificationProvider.
+4. Connection: Bridge between App.jsx and individual features.
+
+==================================================
+FILE 6: frontend/src/router/AppRouter.jsx
+==================================================
+1. File Purpose: Defines the app's URL structure.
+2. Theory: Declarative Routing. Maps paths to components.
+3. Walkthrough:
+   - PublicRoute: For /login (guest only).
+   - ProtectedRoute: For /dashboard, /tasks, etc. (auth only).
+   - MainLayout: Wraps all internal pages with a Sidebar/Navbar.
+4. Connection: Decides which Page component to mount based on the URL.
+
+==================================================
+FILE 7: frontend/src/router/ProtectedRoute.jsx
+==================================================
+1. File Purpose: Security guard for internal pages.
+2. Theory: Higher-Order Component (HOC) pattern (vibe-level).
+3. Walkthrough:
+   - Checks user session from useAuth().
+   - Redirects to /login if unauthenticated.
+   - Shows "Supabase Config Required" if env vars are missing.
+4. Connections: Called by AppRouter.jsx.
+
+==================================================
+FILE 8: frontend/src/router/PublicRoute.jsx
+==================================================
+1. File Purpose: Prevents logged-in users from seeing the login page.
+2. Walkthrough: Redirects to /dashboard if a session exists.
+3. Connections: Wraps /login in AppRouter.jsx.
+
+==================================================
+FILE 9: frontend/src/layouts/MainLayout.jsx
+==================================================
+1. File Purpose: The structural frame for authenticated users.
+2. Theory: Layout Pattern. Centralizes the Sidebar and Topbar.
+3. Walkthrough:
+   - <Outlet />: A React Router placeholder where the current Page is rendered.
+4. Connections: Defines the look of the app post-login.
+
+==================================================
+FILE 10: frontend/src/context/AuthContext.js
+==================================================
+1. File Purpose: Defines the "Shape" of the authentication data.
+2. Theory: Context API. Prevents "Prop Drilling" (passing data through 5 layers).
+3. Walkthrough: Exports a simple createContext(null).
+
+==================================================
+FILE 11: frontend/src/providers/AuthProvider.jsx
+==================================================
+1. File Purpose: The "Brain" of authentication state.
+2. Theory: State Synchronization. Syncs Supabase session with React state.
+3. Walkthrough:
+   - useEffect: Checks for session on mount and subscribes to auth changes.
+   - ensureUserProfile: Automatically inserts/updates user in public.users table.
+   - useMemo: Optimizes the provider value to prevent unnecessary re-renders.
+4. Connections: Consumes authApi.js and userProfileApi.js.
+
+==================================================
+FILE 12: frontend/src/hooks/useAuth.js
+==================================================
+1. File Purpose: Custom hook for easy access to AuthContext.
+2. Theory: Context Consumption Pattern.
+3. Walkthrough: Calls useContext(AuthContext) and throws error if used outside Provider.
+
+==================================================
+FILE 13: frontend/src/services/supabase/client.js
+==================================================
+1. File Purpose: Initializes the connection to Supabase.
+2. Theory: Singleton Pattern. We only want one "client" instance for the whole app.
+3. Walkthrough: Reads env vars and configures auto-refresh for JWTs.
+4. Connections: The foundation for every "Api" service file.
+
+==================================================
+FILE 14: frontend/src/services/supabase/authApi.js
+==================================================
+1. File Purpose: Wraps Supabase Auth SDK functions.
+2. Walkthrough: Simple async functions: signInWithPassword, signOut, getSession.
+3. Connections: Called exclusively by AuthProvider.jsx.
+
+==================================================
+FILE 15: frontend/src/services/userProfileApi.js
+==================================================
+1. File Purpose: Syncs Auth data to our relational DB.
+2. Theory: User Shadowing. Supabase stores users in a private schema; we "shadow" them to our public schema for Foreign Key relations.
+3. Walkthrough: deriveDisplayName() handles various metadata shapes (name, full_name, email prefix).
+
+==================================================
+FILE 16: frontend/src/context/NotificationContext.js
+==================================================
+1. File Purpose: Defines the shape for notification state.
+2. Theory: Pub-Sub (conceptual). Components "subscribe" to notifications here.
+
+==================================================
+FILE 17: frontend/src/providers/NotificationProvider.jsx
+==================================================
+1. File Purpose: Manages alerts, reminders, and browser popups.
+2. Theory: Polling Pattern. Runs refreshNotifications() every 60s.
+3. Walkthrough:
+   - publishedNotificationIdsRef: Ensures we don't spam the same popup twice.
+   - markAsRead: Updates local Set to hide notifications without DB calls (vibe-level).
+4. Connections: Consumes notificationEngine.js.
+
+==================================================
+FILE 18: frontend/src/hooks/useNotifications.js
+==================================================
+1. File Purpose: Custom hook for accessing notifications.
+2. Walkthrough: Consumed by NotificationCenter.jsx and NotificationsPage.jsx.
+
+==================================================
+FILE 19: frontend/src/services/notificationEngine.js
+==================================================
+1. File Purpose: Algorithmic generator for notifications.
+2. Theory: Derivation. Notifications aren't in the DB; they are "derived" from live task/habit data.
+3. Walkthrough:
+   - SEVERITY_RANK: Sorts Critical > Warning > Info.
+   - DAILY_REMINDER: Uses localStorage to ensure only 1 summary per day.
+4. Algorithms: buildUpcomingDeadlineNotifications uses a 4-hour "horizon".
+
+==================================================
+FILE 20: frontend/src/services/tasksApi.js
+==================================================
+1. File Purpose: Task CRUD (Create, Read, Update, Delete).
+2. Theory: Repository Pattern. Centralizes DB access logic.
+3. Walkthrough:
+   - recordTaskHistory: Automatically logs status changes to task_history table.
+   - normalizeTaskPayload: Ensures booleans and dates are correct before hitting Postgres.
+4. Connections: Consumed by TaskManagementPage.jsx and DashboardPage.jsx.
+
+==================================================
+FILE 21: frontend/src/services/habitsApi.js
+==================================================
+1. File Purpose: Habit and Log CRUD.
+2. Walkthrough:
+   - upsertHabitLog: Uses { onConflict: "habit_id,log_date" } to allow toggling.
+3. Connections: Consumed by HabitTrackingPage.jsx and DashboardPage.jsx.
+
+==================================================
+FILE 22: frontend/src/services/analyticsApi.js
+==================================================
+1. File Purpose: Aggregates raw data into chart-ready snapshots.
+2. Theory: Data Transformation.
+3. Walkthrough:
+   - buildRecentDateRange: Generates a list of last 14 days to fill gaps in data.
+   - score: tasksCompleted * 2 + habitsCompleted (Productivity Score algorithm).
+4. Connections: Consumed by AnalyticsPage.jsx.
+
+==================================================
+FILE 23: frontend/src/services/aiAssistantApi.js
+==================================================
+1. File Purpose: Connects the app to Groq AI.
+2. Theory: Prompt Engineering & Context Augmentation.
+3. Walkthrough:
+   - gatherUserContext: Aggregates EVERY bit of user data (Matrix, Overdue, Streaks).
+   - buildSystemPrompt: Hardcodes the AI's "Coaching" personality.
+   - fetch(): Standard HTTP call to Groq LPU endpoint.
+4. Connections: Consumed by AIAssistantPage.jsx.
+
+==================================================
+FILE 24: frontend/src/services/googleCalendarApi.js
+==================================================
+1. File Purpose: Google Calendar OAuth and API wrapper.
+2. Theory: OAuth2 Client-Side Flow. Uses Google Identity Services (GSI).
+3. Walkthrough:
+   - requestAccessToken: Triggers the Google popup.
+   - buildReminderOverrides: Logic to set phone alerts 24h/1h/10m before task.
+4. Connection: Consumed by calendarTaskSyncService.js.
+
+==================================================
+FILE 25: frontend/src/services/calendarSyncApi.js
+==================================================
+1. File Purpose: Tracks which tasks are synced to Google.
+2. Walkthrough: Upserts entries into task_calendar_sync table.
+
+==================================================
+FILE 26: frontend/src/services/calendarTaskSyncService.js
+==================================================
+1. File Purpose: Orchestrator for the Calendar sync.
+2. Theory: Adapter Pattern. Bridges FinishIt tasks and Google Events.
+3. Walkthrough: Coordinates the Google API call + local DB tracking call.
+
+==================================================
+FILE 27: frontend/src/services/dashboardApi.js
+==================================================
+1. File Purpose: Mega-aggregator for the Dashboard Page.
+2. Walkthrough: Promise.all() fetches tasks and habits concurrently for speed.
+
+==================================================
+FILE 28: frontend/src/services/habitStreaks.js
+==================================================
+1. File Purpose: Calculations for current/best streaks.
+2. Theory: Greedy Algorithm.
+3. Walkthrough:
+   - bestStreak: Iterates once, tracking max consecutive days.
+   - currentStreak: Iterates backward from today.
+4. Connections: Used by analyticsApi and notificationEngine.
+
+==================================================
+FILE 29: frontend/src/services/taskPrioritization.js
+==================================================
+1. File Purpose: Core algorithm for Eisenhower Matrix.
+2. Theory: Logic Partitioning.
+3. Walkthrough:
+   - isTaskUrgent: Deadline <= Now + 48 hours.
+   - prioritizeTasks: Sorts by Quadrant, then Deadline, then Importance.
+4. Connections: Powering Dashboard Matrix and Task Grid.
+
+==================================================
+FILE 30: frontend/src/utils/validation.js
+==================================================
+1. File Purpose: Shared schema validation.
+2. Theory: Defensive Programming. Prevents garbage data from reaching the DB.
+3. Walkthrough: Enforces 200-char limits and valid ISO date formats.
+
+==================================================
+FILE 31: frontend/src/pages/DashboardPage.jsx
+==================================================
+1. File Purpose: Main overview landing.
+2. Walkthrough: Triggers getDashboardSnapshot on mount. Manages "Quick Add" modals.
+3. Connections: Master component for 5+ sub-components.
+
+==================================================
+FILE 32: frontend/src/pages/TaskManagementPage.jsx
+==================================================
+1. File Purpose: Full task list and editor.
+2. Walkthrough: Features a dual-state form (Create/Edit). Uses useMemo to filter overdue grid.
+
+==================================================
+FILE 33: frontend/src/pages/HabitTrackingPage.jsx
+==================================================
+1. File Purpose: Habit streaks and Heatmap.
+2. Walkthrough: Contains ConsistencyHeatmap component (last 90 days grid).
+
+==================================================
+FILE 34: frontend/src/pages/AnalyticsPage.jsx
+==================================================
+1. File Purpose: Productivity intelligence dashboard.
+2. Walkthrough: Aggregates 3 different chart components.
+
+==================================================
+FILE 35: frontend/src/pages/AIAssistantPage.jsx
+==================================================
+1. File Purpose: Premium Chat interface.
+2. Walkthrough: renderFormattedContent() implements a mini Markdown renderer (vibe-coded).
+
+==================================================
+FILE 36: frontend/src/pages/CalendarIntegrationPage.jsx
+==================================================
+1. File Purpose: Monthly grid and Sync UI.
+2. Walkthrough: buildCalendarDays() handles month padding for a perfect 42-cell grid.
+
+==================================================
+FILE 37: frontend/src/pages/NotificationsPage.jsx
+==================================================
+1. File Purpose: Detailed notification history.
+2. Walkthrough: Grouped links (Resolve, Open, Rebuild) based on alert type.
+
+==================================================
+FILE 38: frontend/src/pages/LandingPage.jsx
+==================================================
+1. File Purpose: Public-facing branding page.
+2. Theory: Landing Page architecture. High-impact visuals, zero data calls.
+
+==================================================
+FILE 39: frontend/src/pages/LoginPage.jsx
+==================================================
+1. File Purpose: Authentication entry.
+2. Walkthrough: Simple form submission to AuthProvider.
+
+==================================================
+FILE 40-54: Components & UI (Summary)
+==================================================
+- overviewStats.jsx: Displays the 6 KPI cards.
+- HabitCompletionChart.jsx / TaskActivityChart.jsx: Pure SVG charts (no D3/Chart.js used!).
+- TaskDistributionChart.jsx: Pure SVG Donut chart using stroke-dasharray math.
+- AppSidebar.jsx: Main navigation with NavLink for active styling.
+- Button.jsx / Card.jsx: Shared "Atomic" UI components.
+- AppErrorBoundary.jsx: Class-based component (React requirement) to catch crashes.
+
+==================================================
+FILE 55: database/schema/tables/001_phase4_core_schema.sql
+==================================================
+1. File Purpose: The source of truth for our data structure.
+2. Theory: Relational Integrity.
+3. Features:
+   - ENUM types: task_status, habit_frequency.
+   - Triggers: set_updated_at updates the timestamp on every row update.
+   - Constraints: urgency between 1 and 5 (strict validation).
+   - ON DELETE CASCADE: Deleting a user wipes their data (cleanup).
+
+==================================================
+FILE 56: database/migrations/001_calendar_task_sync.sql
+==================================================
+1. File Purpose: Adds the Google Calendar mapping table.
+2. Theory: Junction/Link table logic.
+
+==================================================
+FILE 57: database/migrations/002_urgency_importance_boolean.sql
+==================================================
+1. File Purpose: Migrates 1-5 scales to simple True/False.
+2. Theory: Schema Evolution. Converts data types while preserving existing rows.
+
+--------------------------------------------------------------------
+SECTION: PROJECT-WIDE INTERCONNECTIONS
+--------------------------------------------------------------------
+
+1. DATA FLOW (The Lifecycle of an Action)
+   - User clicks "Complete Task" in TaskManagementPage.jsx.
+   - Page calls tasksApi.updateTask().
+   - tasksApi calls Supabase.
+   - Postgres Trigger set_updated_at() runs.
+   - tasksApi calls recordTaskHistory().
+   - UI updates local state 'tasks'.
+   - React detects state change, re-renders TaskCard.
+   - (After 60s) NotificationProvider polls and detects the task is gone from "Pending", removing its alert.
+
+2. AUTHENTICATION FLOW
+   - Supabase Auth manages JWT.
+   - AuthProvider stores session in state.
+   - ProtectedRoute intercepts URL changes, checking state.
+   - Services get JWT from supabase.auth automatically.
+
+3. ARCHITECTURE DIAGRAM (Text-based)
+   [USER INTERFACE] 
+      ↑ (State Updates)
+   [CONTEXT PROVIDERS (Auth, Notif)]
+      ↑ (Data snapshots)
+   [SERVICES LAYER (API, Algorithms)]
+      ↑ (JSON / Auth Header)
+   [SUPABASE / EXTERNAL APIs (Groq, Google)]
+      ↑ (SQL Queries)
+   [POSTGRESQL DB]
+
+--------------------------------------------------------------------
+SECTION: CODEBASE ARCHITECTURE MAP
+--------------------------------------------------------------------
+
+1. FOLDER RELATIONSHIPS
+   - src/providers: Logic wrappers for the whole app.
+   - src/services: The "Engine room". Pure functions, zero JSX.
+   - src/pages: The "Directors". They tell services to get data and tell components to show it.
+   - src/components: The "Actors". Reusable, dumb UI blocks.
+
+2. LAYERED DESIGN
+   - Separation of Concerns: You can swap the CSS Feature files without touching the API files.
+   - Single Source of Truth: All data flows from the Database -> Snapshot Service -> Page State.
+
+--------------------------------------------------------------------
+SECTION: LEARN THIS PROJECT FROM BEGINNER TO ADVANCED
+--------------------------------------------------------------------
+
+STEP 1 (Beginner): Understand main.jsx -> App.jsx -> AppRouter.jsx. Learn how URLs map to Pages.
+STEP 2 (Junior): Learn tasksApi.js and listTasksByUser. See how a button click becomes a DB call.
+STEP 3 (Intermediate): Master AuthProvider.jsx. Understand how the session is checked on refresh.
+STEP 4 (Advanced): Analyze notificationEngine.js and taskPrioritization.js. Understand the business logic.
+STEP 5 (Master): Study the SVG math in HabitCompletionChart.jsx and the OAuth flow in googleCalendarApi.js.

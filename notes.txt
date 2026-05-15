@@ -1,0 +1,372 @@
+====================================================================
+FINISHIT - MASTER STUDY SYLLABUS & REVISION NOTES
+====================================================================
+This document contains comprehensive explanations, code examples, and conceptual breakdowns for every topic listed in topicsToBeCovered.txt, mapped directly to the FinishIt codebase.
+
+--------------------------------------------------------------------
+1. PROJECT ARCHITECTURE TOPICS
+--------------------------------------------------------------------
+
+# High-level Client-Server Architecture
+Concept: A client-server architecture separates the user interface (client) from the data processing and storage (server).
+In FinishIt: The project uses a "Thick Client" architecture. 
+- **Client:** React + Vite (see `frontend/package.json`).
+- **Server:** Supabase (BaaS).
+- **Service Layer:** `frontend/src/services/supabase/client.js` initializes the connection.
+
+# The Role of Supabase (Backend-as-a-Service)
+Concept: A BaaS provides pre-built backend services.
+In FinishIt:
+1. **Database:** PostgreSQL (see `database/schema/tables/001_phase4_core_schema.sql`).
+2. **Auth:** `frontend/src/services/supabase/authApi.js` handles login/signup.
+3. **API:** PostgREST automatically exposes tables.
+   - *Example:* `supabase.from('tasks').select('*')` in `tasksApi.js` triggers an HTTP GET to Supabase.
+
+# Frontend Folder Structure
+Modularized for Separation of Concerns:
+- `components/`: UI pieces (e.g., `frontend/src/components/dashboard/OverviewStats.jsx`).
+- `pages/`: Route targets (e.g., `frontend/src/pages/DashboardPage.jsx`).
+- `context/` & `providers/`: State management (e.g., `frontend/src/providers/AuthProvider.jsx`).
+- `services/`: Data fetching (e.g., `frontend/src/services/tasksApi.js`).
+- `hooks/`: Reusable logic (e.g., `frontend/src/hooks/useAuth.js`).
+
+# Component interactions and Component Tree
+Defined in `frontend/src/App.jsx` and `frontend/src/router/AppRouter.jsx`.
+Structure: `App` -> `AppProviders` (`AuthProvider`, `NotificationProvider`) -> `AppRouter` -> `MainLayout` -> `<Outlet />`.
+
+Data Flow Patterns:
+1. **Props Down:** `PrioritizedTaskSections.jsx` passing task lists to its child components.
+2. **Events Up:** `TaskManagementPage.jsx` passing `handleDeleteTask` down to task items.
+3. **Global Context:** `useAuth()` hook used in `AppSidebar.jsx` to show the user's name.
+
+# Authentication Flow
+1. **UI:** `frontend/src/pages/LoginPage.jsx` collects credentials.
+2. **API:** `signInWithPassword` in `authApi.js` calls Supabase.
+3. **State:** `AuthProvider.jsx` listens via `supabase.auth.onAuthStateChange`.
+4. **Guard:** `frontend/src/router/ProtectedRoute.jsx` checks the session before rendering.
+
+# Request lifecycle
+Example: Creating a task.
+1. **Trigger:** `TaskManagementPage.jsx` calls `createTask(newTask)`.
+2. **Service:** `tasksApi.js` runs `await supabase.from('tasks').insert(taskData)`.
+3. **History:** `tasksApi.js` also calls `supabase.from('task_history').insert(...)`.
+4. **Re-render:** Local state `tasks` is updated, React re-renders the list.
+
+# System design concepts
+- **Single Source of Truth (SSoT):** Supabase DB.
+- **Optimistic UI:** (Potential improvement) Updating state before the DB confirms.
+- **Separation of Concerns:** `tasksApi.js` handles data, `TaskManagementPage.jsx` handles UI.
+- **JWT:** Managed automatically by the Supabase client stored in `localStorage`.
+
+--------------------------------------------------------------------
+2. FRONTEND TOPICS - THE DEEP DIVE
+--------------------------------------------------------------------
+
+[React Fundamentals: The Engine Under the Hood]
+
+1. Virtual DOM and Reconciliation (The "Diffing" Algorithm)
+   - Concept: React creates a Virtual DOM to minimize expensive real DOM updates.
+   - In FinishIt: When you toggle a task's completion in `TaskManagementPage.jsx`, React identifies the specific `TaskItem` that changed and only re-paints that small part of the UI.
+   - Interview Tip: `key={task.id}` in `TaskManagementPage.jsx` (mapping over tasks) is what allows this precision.
+
+2. Component Lifecycle (Mounting, Updating, Unmounting)
+   - In FinishIt:
+     - **Mounting:** `DashboardPage.jsx` uses `useEffect(() => { loadDashboardData() }, [])` to fetch data on load.
+     - **Unmounting:** `AuthProvider.jsx` returns a cleanup function in `useEffect` to unsubscribe from auth listeners:
+       ```javascript
+       return () => subscription.unsubscribe();
+       ```
+
+3. Functional Components (The Modern Choice)
+   - All components in FinishIt (e.g., `AppSidebar.jsx`, `TaskCard.jsx`) are functional, leveraging hooks for state.
+
+4. React Hooks in Depth
+   - **useState:** `const [tasks, setTasks] = useState([]);` in `TaskManagementPage.jsx`.
+   - **useEffect:** Used in `AnalyticsPage.jsx` to recalculate charts when data changes.
+   - **useContext:** `AuthContext.js` consumed by `useAuth.js` hook.
+   - **useMemo:** Used in `HabitCompletionChart.jsx` to cache complex data calculations.
+   - **useCallback:** Used in `TaskManagementPage.jsx` to memoize the `onDelete` handler passed to children.
+
+5. Prop Drilling vs Context API
+   - **Context Solution:** `AuthProvider.jsx` wraps the entire app in `App.jsx`, providing the `user` object to deeply nested components like `Navbar.jsx` without passing it manually.
+
+6. State Management: Local vs Context
+   - **Local State:** `isModalOpen` in a form component.
+   - **Context State:** `session` and `user` in `AuthProvider.jsx`.
+
+7. Controlled vs Uncontrolled Components
+   - **Controlled:** The "Add Task" form in `TaskManagementPage.jsx` uses `value={title}` and `onChange={e => setTitle(e.target.value)}`.
+
+[Routing: React Router DOM v6]
+
+1. BrowserRouter, Routes, Route
+   - Configured in `frontend/src/router/AppRouter.jsx`.
+
+2. Protected vs Public Routes (Route Guards)
+   - **ProtectedRoute.jsx:** Wraps internal routes to check for `user` presence.
+   - **PublicRoute.jsx:** Prevents logged-in users from seeing the `LoginPage`.
+
+3. Navigate and useNavigate hook
+   - `useNavigate` is used in `LoginPage.jsx` to redirect to `/dashboard` after success.
+
+4. Outlet (The Layout Placeholder)
+   - Used in `frontend/src/layouts/MainLayout.jsx` to render the active page content inside the sidebar/navbar shell.
+
+[CSS & Styling Architecture]
+
+1. Vanilla CSS & Custom Properties (Variables)
+   - **Architecture folders:** `frontend/src/styles/` (base, features, themes).
+   - **Theme Variables:** `frontend/src/styles/themes/light.css` defines `--primary-color`.
+
+2. Flexbox vs CSS Grid
+   - **Flexbox:** Used in `Navbar.jsx` for horizontal alignment.
+   - **CSS Grid:** Used in `HabitTrackingOverview.jsx` for the weekly grid layout.
+
+6. Responsive Design & HTML
+   - **Media Queries:** Found in `frontend/src/styles/layout.css` to hide the sidebar on mobile.
+   - **Semantic HTML:** `frontend/src/layouts/MainLayout.jsx` uses `<nav>`, `<aside>`, and `<main>`.
+
+[JavaScript Concepts in React - Continued]
+
+1. ES6 Modules: `import` / `export` used in every file.
+2. Asynchronous JS (Promises & Async/Await):
+   - Used in `calendarSyncApi.js`: `const { data, error } = await supabase...`
+3. Array Methods (The "Big Six"):
+   - `.map()`: Used in `PrioritizedTaskSections.jsx` to render task cards.
+   - `.filter()`: Used in `DashboardPage.jsx` to separate "Overdue" tasks.
+   - `.reduce()`: Used in `analyticsApi.js` to aggregate stats.
+4. Spread (...) vs. Rest (...) Operators:
+   - **Spread:** `setTasks([...prev, newTask])` in task services.
+   - **Rest:** `function Button({ label, ...props })` in `Button.jsx`.
+5. Optional Chaining (`?.`): `user?.id` used in `useNotifications.js`.
+6. Closures: Used in event handlers in `TaskManagementPage.jsx` to capture the `id` of the task being edited.
+
+--------------------------------------------------------------------
+3. BACKEND & API TOPICS - THE INFRASTRUCTURE
+--------------------------------------------------------------------
+
+[Supabase: The Backend-as-a-Service Powerhouse]
+
+1. Supabase Architecture (The "Stack")
+   - **Client Init:** `frontend/src/services/supabase/client.js`.
+   - **PostgREST:** The reason we can do `supabase.from('habits').select()` without a custom controller.
+   - **Realtime:** Enabled in `frontend/src/services/notificationEngine.js` to listen for new tasks.
+
+2. JWT (JSON Web Tokens) & Session Management
+   - **Storage:** Supabase SDK stores the JWT in `localStorage` under `sb-<project-id>-auth-token`.
+   - **Refresh:** `AuthProvider.jsx` handles session refreshes automatically via the SDK.
+
+3. Separation of Concerns: The `services/` Layer
+   - **Example:** `tasksApi.js` abstracts the Supabase syntax so `TaskManagementPage.jsx` doesn't need to know about `.from('tasks')`.
+
+[AI Integration: Groq LPU™ Inference Engine]
+
+1. Why Groq?
+   - Speed. LPU (Language Processing Unit) inference is near-instant for coaching.
+
+2. Role-Based Chat Completion
+   - **Logic:** `frontend/src/services/aiAssistantApi.js`.
+   - **System Prompt:** Hardcoded in `aiAssistantApi.js` to define the AI's "Coach" personality.
+
+[External APIs: Google Calendar Sync]
+
+1. OAuth2 Workflow
+   - **Implementation:** `frontend/src/services/googleCalendarApi.js`.
+   - **Token Management:** Handled via `requestAccessToken()` which uses the Google Identity Services (GIS) library.
+
+2. Mapping Data Models
+   - **Sync Service:** `frontend/src/services/calendarTaskSyncService.js` maps FinishIt tasks to Google Event objects.
+
+[External API Calls: The Standard Fetch API]
+
+1. Native fetch() vs. Supabase SDK
+   - **Groq Example:** `aiAssistantApi.js` uses `fetch(GROQ_ENDPOINT, ...)` because Groq isn't part of Supabase.
+   - **Google Example:** `googleCalendarApi.js` uses `fetch()` to call the Google Calendar v3 REST API.
+
+--------------------------------------------------------------------
+4. DATABASE TOPICS - THE DATA FOUNDATION
+--------------------------------------------------------------------
+
+[PostgreSQL: The Relational Powerhouse]
+
+1. Supabase Auth (`auth.users`) vs. Public (`public.users`)
+   - **Sync Logic:** `AuthProvider.jsx` calls `ensureUserProfile()` which performs a `upsert` on the `public.users` table.
+
+2. Table Structures (see `database/schema/tables/001_phase4_core_schema.sql`)
+   - **tasks:** Primary table for user actions.
+   - **habit_logs:** Tracks daily completions.
+   - **task_history:** Audit log for status changes.
+   - **task_calendar_sync:** Maps `task_id` to `external_event_id`.
+
+3. Data Types (Postgres Specifics)
+   - **uuid:** Used for all Primary Keys (`id`).
+   - **timestamptz:** Used for `created_at` and `deadline`.
+   - **enum:** `task_status` in `001_phase4_core_schema.sql`.
+
+4. Integrity Constraints
+   - **Check Constraint:** `tasks_urgency_range` (urgency BETWEEN 1 AND 5).
+   - **Foreign Key:** `tasks.user_id` references `users.id` with `ON DELETE CASCADE`.
+
+5. Triggers and Functions
+   - **set_updated_at():** A shared function in `001_phase4_core_schema.sql` that updates the `updated_at` column automatically.
+
+6. Database Indexing
+   - **B-Tree Indexes:** `idx_tasks_user_id` and `idx_habits_user_active` created to optimize dashboard load times.
+
+7. Row Level Security (RLS)
+   - **Policy Example:** `CREATE POLICY "Users can only see their own tasks" ON tasks USING (auth.uid() = user_id);`
+
+8. SQL vs. NoSQL
+   - Why Postgres? Data Integrity and ACID compliance for relational tasks.
+
+--------------------------------------------------------------------
+5. SYNTAX-LEVEL TOPICS - THE DEVELOPER'S TOOLKIT
+--------------------------------------------------------------------
+
+[React Hooks Syntax]
+
+1. `useEffect` cleanup
+   - **File:** `frontend/src/providers/AuthProvider.jsx`.
+   - **Code:**
+   ```javascript
+   useEffect(() => {
+     const { data: { subscription } } = supabase.auth.onAuthStateChange(...);
+     return () => subscription.unsubscribe(); // Standard cleanup pattern
+   }, []);
+   ```
+
+2. `useState` functional update
+   - **File:** `frontend/src/pages/TaskManagementPage.jsx`.
+   - **Code:**
+   ```javascript
+   setTasks(prev => prev.filter(t => t.id !== deletedId)); // Ensures state consistency
+   ```
+
+[Modern JavaScript]
+
+1. Async/Await and Error Handling
+   - **File:** `frontend/src/services/tasksApi.js`.
+   - **Code:**
+   ```javascript
+   async function listTasksByUser(id) {
+     try {
+       const { data, error } = await supabase.from('tasks').select('*').eq('user_id', id);
+       if (error) throw error;
+       return data;
+     } catch (err) {
+       console.error(err); // try/catch block for robust APIs
+     }
+   }
+   ```
+
+2. Destructuring Props
+   - **File:** `frontend/src/components/ui/Card.jsx`.
+   - **Code:**
+   ```javascript
+   export function Card({ title, children, className = '' }) { ... }
+   ```
+
+--------------------------------------------------------------------
+6. VIVA QUESTIONS PREPARATION - THE "BOSS" LEVEL
+--------------------------------------------------------------------
+
+[Category: Beginner - The Basics]
+
+Q1: What is the core purpose of FinishIt?
+A: FinishIt is a holistic productivity ecosystem using the Eisenhower Matrix and AI coaching.
+
+Q2: Why React? Why not just HTML/JS?
+A: Declarative UI and efficient DOM updates via the Virtual DOM.
+
+Q3: What is a "Component" in this project?
+A: A reusable UI building block (e.g., `TaskCard.jsx`).
+
+Q4: What does `npm run dev` actually do?
+A: Starts the Vite dev server using Native ESM for fast hot module replacement.
+
+Q5: How do you create a new component?
+A: Define a functional component in `src/components/`, export it, and import it where needed.
+
+[Category: Intermediate - The Logic]
+
+Q6: Walk me through the "Add Task" flow.
+A: UI Form -> `tasksApi.createTask` -> Supabase Insert -> History Log -> Local State Update.
+
+Q7: How does the app handle authentication state?
+A: `AuthProvider.jsx` listens to Supabase auth changes and updates a global `user` context.
+
+Q8: Difference between `useEffect` and standard function call?
+A: `useEffect` is synchronized with the component lifecycle and dependency array.
+
+Q9: How did you manage the global "Theme"?
+A: CSS Variables in `themes/light.css` toggled via a class on the `body`.
+
+[Category: Advanced - The Architecture]
+
+Q10: How do you handle race conditions in state updates?
+A: Use functional updates in `useState`: `setTasks(prev => [...prev, newTask])`.
+
+Q11: Why sync auth.users and public.users?
+A: To allow relational queries and custom profile data while keeping auth secure.
+
+Q12: How does the Eisenhower Matrix algorithm work?
+A: Filtering the task list based on `is_urgent` and `is_important` booleans.
+
+Q13: Performance impact of Context API?
+A: Every consumer re-renders on value change; avoid putting high-frequency data in Context.
+
+[Category: The "Trap" Questions]
+
+Q14: What if a user disables JavaScript?
+A: The SPA will not render; it requires JS for the Virtual DOM.
+
+Q15: How to protect API Keys?
+A: Use `.env` files for development and move client-side calls to Edge Functions for production.
+
+Q16: Why Postgres over MongoDB?
+A: Relational integrity, ACID compliance, and strong schema enforcement.
+
+Q17: Why Supabase over custom Express?
+A: Faster development (BaaS), built-in auth, and auto-generated REST API.
+
+Q18: Two users in different tabs?
+A: They share `localStorage`, so they share the same session.
+
+Q19: Infinite `useEffect` loop?
+A: Caused by updating a dependency inside the effect; fix by using functional updates or refactoring dependencies.
+
+Q20: Groq AI prompt injection?
+A: Mitigated by strict system prompts and limiting the AI's role.
+
+Q21: Supabase goes down?
+A: Frontend remains but data operations fail; handled via `try/catch` and Error Boundaries.
+
+--------------------------------------------------------------------
+7. ADVANCED TOPICS - SCALABILITY, SECURITY, & PERFORMANCE
+--------------------------------------------------------------------
+
+[Scalability]
+1. **Connection Pooling:** Use PgBouncer (Port 6543 on Supabase) to handle high traffic.
+2. **Pagination:** Use `.range(from, to)` in `tasksApi.js` to avoid loading too much data.
+
+[Security Hardening]
+1. **XSS:** React automatically escapes content.
+2. **CSRF:** Use JWTs in headers instead of cookies.
+3. **RLS:** The ultimate database-level security.
+
+[Performance]
+1. **Memoization:** `useMemo` in `HabitCompletionChart.jsx`.
+2. **Lazy Loading:** `React.lazy()` for route-level code splitting.
+
+--------------------------------------------------------------------
+8. IMPROVEMENT & EXTENSION TOPICS - THE FUTURE ROADMAP
+--------------------------------------------------------------------
+
+[1. Row Level Security (RLS)]
+- **Action:** Enable RLS in `001_phase4_core_schema.sql` and define owner policies.
+
+[2. Secure AI Proxies]
+- **Action:** Use Supabase Edge Functions to call Groq, keeping the API key on the server.
+
+[3. Infinite Scroll]
+- **Action:** Implement in `TaskManagementPage.jsx` using `IntersectionObserver`.
